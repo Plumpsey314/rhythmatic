@@ -8,7 +8,7 @@ export default function App(props: AppProps) {
   return (
     <>
       <Head>
-        <title>AI Music</title>
+        <title>Finetune</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Component {...pageProps} />
