@@ -17,6 +17,38 @@ export default function Track(props: any) {
 
   return (
     <div className={styles.container}>
+      <a
+        href={external_urls['spotify']} target="_blank" rel="noopener noreferrer"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={album.images[0].url} alt="" />
+        <div className={styles.details}>
+          <h1>{name}</h1>
+          <p>{artists.map((artist: any) => artist.name).join(', ')}</p>
+          <p>{album.name}</p>
+        </div>
+        <span className={styles.flexfill} />
+      </a>
+      <div className={styles.save}>
+        {
+          session &&
+          <>
+            {
+              !saved ?
+                <Tooltip title="Save to Spotify" arrow placement="top">
+                  <button onClick={() => saveTrack(id)}>
+                    <AddIcon fontSize="large" />
+                  </button>
+                </Tooltip> :
+                <Tooltip title="Saved!" arrow placement="top">
+                  <div>
+                    <CheckIcon fontSize="large" />
+                  </div>
+                </Tooltip>
+            }
+          </>
+        }
+      </div>
     </div>
   );
 }
