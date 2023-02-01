@@ -19,6 +19,82 @@ export default function Home() {
     }
   });
 
+  // gets data for given tracks
+  async function getTracks(data: string[]) {
+    setLoading('Retrieving Spotify data for songs...');
+    const tracksData = [];
+    for (const piece of data) {
+      const [song, artist] = piece.split('\n');
+      const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}}`)
+      const json = await response.json();
+      if (!json?.tracks?.items[0]) continue;
+      tracksData.push(json.tracks.items[0]);
+    }
+    console.log(tracksData);
+    setTracks(tracksData as any);
+    setLoading(null);
+  }
+
+  // generates songs from chatgpt
+  async function generateSongs() {
+    // check spotify login
+    if (!session) {
+      window.alert('Please log in with Spotify first.');
+      return;
+    }
+
+    // update loading state
+    if (loading) return;
+    setLoading('Sending your preferences to ChatGPT...')
+
+    // return if no text
+    if (!text || !text.trim()) return;
+
+    // make request to chatgpt
+    const response = await fetch("/api/openai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text })
+    });
+
+    // clear text
+    setText('');
+
+    // parse json data
+    const data = await response.json();
+    if (response.status !== 200) {
+      setLoading(null);
+      throw data.error || new Error(`Request failed with status ${response.status}`);
+    }
+
+    console.log(data.result);
+
+    // parse raw result
+    let raw = data.result;
+    const bracketIndex = raw.indexOf('[');
+    if (bracketIndex === -1) {
+      setLoading(null);
+      throw 'invalid result';
+    }
+    raw = raw.substring(bracketIndex);
+    console.log(raw);
+
+    // parse song array
+    let songArray: string[];
+    try {
+      songArray = JSON.parse(raw);
+    } catch (e) {
+      setLoading(null);
+      throw `Something went wrong parsing the result: ${e}`
+    }
+
+    // get tracks from song data
+    console.log(songArray);
+    getTracks(songArray);
+  }
+
   return (
     <div className={styles.container}>
       <Header session={session} />
