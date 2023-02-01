@@ -20,19 +20,29 @@ export default function Home() {
   });
 
   // gets data for given tracks
-  async function getTracks(data: string[]) {
-    setLoading('Retrieving Spotify data for songs...');
-    const tracksData = [];
-    for (const piece of data) {
-      const [song, artist] = piece.split('\n');
-      const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}}`)
-      const json = await response.json();
-      if (!json?.tracks?.items[0]) continue;
-      tracksData.push(json.tracks.items[0]);
-    }
-    console.log(tracksData);
-    setTracks(tracksData as any);
+  async function getTracks(tracksData: string[]) {
     setLoading(null);
+    setTracks([]);
+    let index = 0;
+    let allTracks: any[] = [];
+    async function makeRequest(tracksData: string[]) {
+      if (index === tracksData.length) {
+        setTracks(allTracks);
+        return;
+      }
+      const trackData = tracksData[index];
+      const [song, artist] = trackData.split('\n');
+      const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}}`);
+      const data = await response.json();
+      const track = data?.tracks?.items[0];
+      if (track) {
+        setTracks(tracks => tracks ? [...tracks, track] : [track]);
+        allTracks.push(track);
+      }
+      index++;
+      makeRequest(tracksData);
+    }
+    makeRequest(tracksData);
   }
 
   // generates songs from chatgpt
@@ -76,6 +86,7 @@ export default function Home() {
     const bracketIndex = raw.indexOf('[');
     if (bracketIndex === -1) {
       setLoading(null);
+      window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
       throw 'invalid result';
     }
     raw = raw.substring(bracketIndex);
