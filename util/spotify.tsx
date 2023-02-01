@@ -30,3 +30,12 @@ export async function saveTrack(refresh_token: string, id: string) {
     }
   });
 };
+
+export async function searchTrack(refresh_token: string, song: string, artist: string) {
+  const { access_token } = await getAccessToken(refresh_token);
+  return fetch(`${SEARCH_ENDPOINT}?q=track:${encodeURIComponent(song)}%20artist:${encodeURIComponent(artist)}&type=track&limit=1`, {
+    headers: {
+      Authorization: `Bearer ${access_token}`
+    }
+  });
+};
