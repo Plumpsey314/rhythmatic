@@ -1,4 +1,4 @@
-import { getPrompt } from "@/util/prompt";
+import { settings } from "@/settings";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
 
@@ -29,10 +29,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: getPrompt() + text,
-      temperature: 0.6,
-      max_tokens: 2048
+      model: settings.model,
+      prompt: settings.prompt + text,
+      temperature: settings.temperature,
+      max_tokens: settings.maxTokens
     });
     console.log(completion.data.choices);
     res.status(200).json({ result: completion.data.choices[0].text });
