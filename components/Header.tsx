@@ -48,7 +48,7 @@ export default function Header(props: Props) {
               Sign Out
             </button>
           </> :
-          <button onClick={() => signIn()}>
+          <button onClick={() => signIn('spotify')}>
             Log in with Spotify
           </button>
       }
