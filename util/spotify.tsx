@@ -20,3 +20,13 @@ async function getAccessToken(refresh_token: string) {
 
   return response.json();
 };
+
+export async function saveTrack(refresh_token: string, id: string) {
+  const { access_token } = await getAccessToken(refresh_token);
+  return fetch(`${TRACKS_ENDPOINT}?ids=${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${access_token}`
+    }
+  });
+};
