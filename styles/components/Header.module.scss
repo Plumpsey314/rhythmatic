@@ -1,0 +1,84 @@
+.container {
+  display: flex;
+  align-items: center;
+  box-shadow: 0 0 4px #000;
+  height: var(--header);
+  padding: 0 20px;
+  color: var(--spotify-black);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+
+  >h1 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    user-select: none;
+
+    .logo {
+      margin-right: 12px;
+
+      @media (max-width: 991.98px) {
+        margin-right: 2px;
+      }
+    }
+
+    >span {
+      @media (max-width: 991.98px) {
+        display: none;
+      }
+    }
+  }
+
+  >.tm {
+    user-select: none;
+
+    @media (max-width: 991.98px) {
+      display: none;
+    }
+  }
+
+  >.x {
+    margin: 0 8px;
+    font-size: 24px;
+    user-select: none;
+  }
+
+  .spotify {
+    @media (max-width: 991.98px) {
+      display: none;
+    }
+  }
+
+  .spotify_icon {
+    @media (min-width: 992px) {
+      display: none;
+    }
+  }
+
+  .flexfill {
+    flex-grow: 1;
+  }
+
+  >.name {
+    margin-right: 12px;
+
+    @media (max-width: 699.98px) {
+      display: none;
+    }
+  }
+
+  >button {
+    border: 0;
+    padding: 16px 32px;
+    border-radius: 32px;
+    font-size: 16px;
+    background: var(--spotify-green);
+    color: #fff;
+
+    &:hover {
+      background: var(--spotify-green-alt);
+    }
+  }
+}
