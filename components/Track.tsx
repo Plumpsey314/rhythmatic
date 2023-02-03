@@ -15,33 +15,32 @@ export default function Track(props: any) {
   // saves given track to library
   async function saveTrack(id: string) {
     setSaved(true);
-    await fetch(`/api/savetrack?id=${encodeURIComponent(id)}`);
+    const response = await fetch(`/api/savetrack?id=${encodeURIComponent(id)}`);
+    // handle api error
+    if (response.status !== 200) {
+      window.alert(`Something went wrong saving track: ${response.status} ${response.statusText}`);
+    }
   };
 
   if (!external_urls || !artists || !album) return null;
 
   return (
     <div className={styles.container}>
-      <a
-        href={external_urls['spotify']} target="_blank" rel="noopener noreferrer"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={album.images[0].url} alt="" />
-        <div className={styles.details}>
-          <h1>{name}</h1>
-          <p>{artists.map((artist: any) => artist.name).join(', ')}</p>
-          <p>{album.name}</p>
-        </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={album.images[0].url} alt="" />
+      <div className={styles.details}>
+        <h1>{name}</h1>
+        <p>{artists.map((artist: any) => artist.name).join(', ')}</p>
+        <p>{album.name}</p>
+      </div>
+      <div className={styles.alts}>
         <audio src={preview_url} controls />
-        <p>
-          Popularity: {popularity}
-          <br />Release date: {album.release_date}
-          <br />Length: {duration_ms / 1000} sec
-          <br />Explicit: {explicit ? 'Yes' : 'No'}
-          <br />Spotify ID: {id}
-        </p>
-        <span className={styles.flexfill} />
-      </a>
+        <a href={external_urls['spotify']} target="_blank" rel="noopener noreferrer">
+          Spotify link
+        </a>
+        <p>Popularity: {popularity}/100</p>
+      </div>
+      <span className={styles.flexfill} />
       <div className={styles.save}>
         {
           session &&
@@ -62,6 +61,6 @@ export default function Track(props: any) {
           </>
         }
       </div>
-    </div>
+    </div >
   );
 }
