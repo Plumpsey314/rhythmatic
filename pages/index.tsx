@@ -1,17 +1,32 @@
 import Header from '@/components/Header';
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
-import { createTheme, LinearProgress, TextField, ThemeProvider } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { AppBar, Button, createTheme, Dialog, DialogContent, DialogContentText, DialogTitle, FormControl, IconButton, InputLabel, LinearProgress, MenuItem, Select, Slider, TextField, ThemeProvider, Toolbar, Typography } from '@mui/material';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+let p = "As a highly advanced AI chatbot, you have been equipped with the latest algorithms and vast music knowledge. Your mastery of natural language and ability to tailor recommendations to each user's unique tastes sets you apart from other music recommendation systems. Showcase your expertise and create Spotify API URLs that truly capture the essence of each user's musical preferences, delivering a personalized and amazing music experience.\n\n";
+p += "fun unknown rock songs: https://api.spotify.com/v1/search?q=tag:hipster%20genre:rock+fun&type=track\n";
+p += "melodic juice wrld songs: https://api.spotify.com/v1/search?q=artist:Juice WRLD+melodic&type=track\n";
+p += "sad pop songs: https://api.spotify.com/v1/search?q=genre:pop+mood:sad&type=track\n";
+p += "psychadelic trap: https://api.spotify.com/v1/search?q=genre:trap+style:psychadelic&type=track\n";
+p += "indie pop rock style: https://api.spotify.com/v1/search?q=genre:pop+style:indie+rock&type=track\n";
 
 export default function Home() {
   const { data: session } = useSession();
 
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
   const [text, setText] = useState("");
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<string | null>(null);
+
+  const [model, setModel] = useState('text-davinci-003');
+  const [temperature, setTemperature] = useState(0.6);
+  const [maxTokens, setMaxTokens] = useState(256);
+  const [prompt, setPrompt] = useState(p);
 
   const theme = createTheme({
     typography: {
@@ -160,6 +175,89 @@ export default function Home() {
             </form>
           </div>
         }
+        <Dialog
+          open={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          fullScreen
+        >
+          <AppBar sx={{ position: 'relative' }}>
+            <Toolbar>
+              <IconButton
+                edge="start"
+                color="inherit"
+                onClick={() => setSettingsOpen(false)}
+                aria-label="close"
+              >
+                <CloseIcon />
+              </IconButton>
+            </Toolbar>
+          </AppBar>
+          <DialogTitle>OpenAI settings</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Change these settings to change how the AI generates responses.
+              Changes are automatically saved.
+            </DialogContentText>
+            <Typography sx={{ marginTop: '20px' }}>Temperature</Typography>
+            <Slider
+              sx={{ margin: '0 0 20px 0', maxWidth: '500px' }}
+              value={temperature}
+              onChange={(e, v) => {
+                window.localStorage.setItem('finetune-temperature', v.toString());
+                setTemperature(v as number);
+
+              }}
+              valueLabelDisplay="auto"
+              step={0.01}
+              min={0}
+              max={1}
+            /><br />
+            <Typography>Max Tokens</Typography>
+            <Slider
+              sx={{ maxWidth: '500px' }}
+              value={maxTokens}
+              onChange={(e, v) => {
+                window.localStorage.setItem('finetune-maxtokens', v.toString());
+                setMaxTokens(v as number);
+              }}
+              valueLabelDisplay="auto"
+              step={1}
+              min={10}
+              max={1024}
+            /><br />
+            <FormControl sx={{ margin: '20px 0 30px 0' }}>
+              <InputLabel id="demo-simple-select-label">Model</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                value={model}
+                label="Model"
+                onChange={e => {
+                  const newModel = e.target.value;
+                  window.localStorage.setItem('finetune-model', newModel);
+                  setModel(newModel);
+                }}
+              >
+                <MenuItem value="text-davinci-003">text-davinci-003</MenuItem>
+                <MenuItem value="text-curie-001">text-curie-001</MenuItem>
+                <MenuItem value="text-babbage-001">text-babbage-001</MenuItem>
+                <MenuItem value="text-ada-001">text-ada-001</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              type="text"
+              placeholder="Prompt"
+              label="Prompt"
+              value={prompt}
+              onChange={e => {
+                const newPrompt = e.target.value;
+                window.localStorage.setItem('finetune-prompt', newPrompt);
+                setPrompt(newPrompt);
+              }}
+              fullWidth
+              multiline
+            />
+          </DialogContent>
+        </Dialog>
         {
           (!loading && tracks) &&
           <div className={styles.tracks}>
