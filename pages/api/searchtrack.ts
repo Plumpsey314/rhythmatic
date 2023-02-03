@@ -4,13 +4,17 @@ import { getSession } from 'next-auth/react';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { token: { accessToken } } = (await getSession({ req })) as any;
-  const { song, artist } = req.query;
-  if (typeof song !== 'string' || typeof artist !== 'string') {
-    throw 'invalid search query';
+  const { url } = req.query;
+  if (typeof url !== 'string') throw 'invalid search url';
+  const response = await searchTrack(accessToken, url);
+  // handle ok
+  if (response.ok) {
+    const data = await response.json();
+    return res.status(200).json(data);
   }
-  const response = await searchTrack(accessToken, song, artist);
-  const data = await response.json();
-  return res.status(200).json(data);
+  // handle error
+  console.error(response.status, response.statusText);
+  return res.status(response.status).json({});
 };
 
 export default handler;

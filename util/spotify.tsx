@@ -3,7 +3,6 @@ const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
 const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
 const TRACKS_ENDPOINT = 'https://api.spotify.com/v1/me/tracks';
-const SEARCH_ENDPOINT = 'https://api.spotify.com/v1/search';
 
 async function getAccessToken(refresh_token: string) {
   const response = await fetch(TOKEN_ENDPOINT, {
@@ -23,23 +22,19 @@ async function getAccessToken(refresh_token: string) {
 
 export async function saveTrack(refresh_token: string, id: string) {
   const { access_token } = await getAccessToken(refresh_token);
-  const response = await fetch(`${TRACKS_ENDPOINT}?ids=${encodeURIComponent(id)}`, {
+  return await fetch(`${TRACKS_ENDPOINT}?ids=${encodeURIComponent(id)}`, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${access_token}`
     }
   });
-  if (response.ok) return response;
-  throw `save track failed: ${response.status} ${response.statusText}`;
 };
 
-export async function searchTrack(refresh_token: string, song: string, artist: string) {
+export async function searchTrack(refresh_token: string, url: string) {
   const { access_token } = await getAccessToken(refresh_token);
-  const response = await fetch(`${SEARCH_ENDPOINT}?q=track:${encodeURIComponent(song)}%20artist:${encodeURIComponent(artist)}&type=track&limit=1`, {
+  return await fetch(url, {
     headers: {
       Authorization: `Bearer ${access_token}`
     }
   });
-  if (response.ok) return response;
-  throw `search track failed: ${response.status} ${response.statusText}`;
 };
