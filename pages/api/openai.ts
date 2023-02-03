@@ -1,4 +1,3 @@
-import { settings } from "@/settings";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
 
@@ -27,14 +26,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
 
+  const { model, temperature, maxTokens, prompt } = req.body;
+
   try {
     const completion = await openai.createCompletion({
-      model: settings.model,
-      prompt: settings.prompt + text,
-      temperature: settings.temperature,
-      max_tokens: settings.maxTokens
+      model: model,
+      prompt: prompt + text + ": ",
+      temperature: temperature,
+      max_tokens: maxTokens
     });
-    console.log(completion.data.choices);
     res.status(200).json({ result: completion.data.choices[0].text });
   } catch (error: any) {
     // Consider adjusting the error handling logic for your use case

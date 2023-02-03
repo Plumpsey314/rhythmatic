@@ -56,6 +56,18 @@ export default function Home() {
       }
       index++;
       makeRequest(tracksData);
+  // load local storage on start
+  useEffect(() => {
+    const newPrompt = window.localStorage.getItem('finetune-prompt');
+    if (newPrompt !== null) setPrompt(newPrompt);
+    const newModel = window.localStorage.getItem('finetune-model');
+    if (newModel !== null) setModel(newModel);
+    const newMaxTokens = window.localStorage.getItem('finetune-maxtokens');
+    if (newMaxTokens !== null) setMaxTokens(parseInt(newMaxTokens));
+    const newTemperature = window.localStorage.getItem('finetune-temperature');
+    if (newTemperature !== null) setTemperature(parseFloat(newTemperature));
+  }, []);
+
     }
     makeRequest(tracksData);
   }
