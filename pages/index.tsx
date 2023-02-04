@@ -154,16 +154,20 @@ export default function Home() {
           <div
             className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
           >
-            <div>
+            <div >
               <Image
                 src="/img/logo.svg"
                 width="374"
                 height="51"
+                className={styles.logo_container}
                 alt="logo.svg"
               />
-              <p>combines the power</p>
+              <p className={styles.wide_screen}>combines the power</p>
             </div>
-            <p>of Spotify and ChatGPT to supercharge your music recommendations. Try it out below!</p>
+            <p>
+              <span className={styles.narrow_screen}>combines the power </span>
+              of Spotify and ChatGPT to supercharge your music recommendations. Try it out below!
+            </p>
           </div>
           <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
@@ -171,13 +175,14 @@ export default function Home() {
           }}>
             <input
               type="text"
+              className={styles.form_contents}
               placeholder={textPlaceholder}
               value={text}
               onChange={e => setText(e.target.value)}
               spellCheck="false"
               required
             />
-            <button>
+            <button className={styles.form_contents}>
               <Image
                 src="/icons/bolt.svg"
                 width="36"
