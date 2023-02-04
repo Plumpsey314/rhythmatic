@@ -16,9 +16,21 @@ async function getAccessToken(refresh_token: string) {
       refresh_token,
     }),
   });
-
   return response.json();
 };
+
+async function getClientAccessToken() {
+  const response = await fetch(TOKEN_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${basic}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'grant_type=client_credentials'
+  });
+  return response.json();
+}
+
 
 export async function saveTrack(refresh_token: string, id: string) {
   const { access_token } = await getAccessToken(refresh_token);
@@ -30,8 +42,8 @@ export async function saveTrack(refresh_token: string, id: string) {
   });
 };
 
-export async function searchTrack(refresh_token: string, url: string) {
-  const { access_token } = await getAccessToken(refresh_token);
+export async function searchTrack(url: string) {
+  const { access_token } = await getClientAccessToken();
   return await fetch(url, {
     headers: {
       Authorization: `Bearer ${access_token}`

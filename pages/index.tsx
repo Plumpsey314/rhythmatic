@@ -42,12 +42,6 @@ export default function Home() {
 
   // generates songs from chatgpt
   async function generateSongs() {
-    // check spotify login
-    if (!session) {
-      window.alert('Please log in with Spotify first.');
-      return;
-    }
-
     // update loading state
     if (loading) return;
     setLoading('Sending your preferences to ChatGPT...')
