@@ -1,8 +1,7 @@
 import Header from '@/components/Header';
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
-import CloseIcon from '@mui/icons-material/Close';
-import { AppBar, Button, createTheme, Dialog, DialogContent, DialogContentText, DialogTitle, FormControl, IconButton, InputLabel, LinearProgress, MenuItem, Select, Slider, TextField, ThemeProvider, Toolbar, Typography } from '@mui/material';
+import { createTheme, LinearProgress, TextField, ThemeProvider } from '@mui/material';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -17,34 +16,15 @@ p += "indie pop rock style: https://api.spotify.com/v1/search?q=genre:pop+style:
 export default function Home() {
   const { data: session } = useSession();
 
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
   const [text, setText] = useState("");
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<string | null>(null);
-
-  const [model, setModel] = useState('text-davinci-003');
-  const [temperature, setTemperature] = useState(0.6);
-  const [maxTokens, setMaxTokens] = useState(256);
-  const [prompt, setPrompt] = useState(p);
 
   const theme = createTheme({
     typography: {
       fontFamily: 'Outfit, sans-serif'
     }
   });
-
-  // load local storage on start
-  useEffect(() => {
-    const newPrompt = window.localStorage.getItem('finetune-prompt');
-    if (newPrompt !== null) setPrompt(newPrompt);
-    const newModel = window.localStorage.getItem('finetune-model');
-    if (newModel !== null) setModel(newModel);
-    const newMaxTokens = window.localStorage.getItem('finetune-maxtokens');
-    if (newMaxTokens !== null) setMaxTokens(parseInt(newMaxTokens));
-    const newTemperature = window.localStorage.getItem('finetune-temperature');
-    if (newTemperature !== null) setTemperature(parseFloat(newTemperature));
-  }, []);
 
   // gets tracks from spotify with given url
   async function getTracks(url: string) {
@@ -171,89 +151,6 @@ export default function Home() {
             </form>
           </div>
         }
-        <Dialog
-          open={settingsOpen}
-          onClose={() => setSettingsOpen(false)}
-          fullScreen
-        >
-          <AppBar sx={{ position: 'relative' }}>
-            <Toolbar>
-              <IconButton
-                edge="start"
-                color="inherit"
-                onClick={() => setSettingsOpen(false)}
-                aria-label="close"
-              >
-                <CloseIcon />
-              </IconButton>
-            </Toolbar>
-          </AppBar>
-          <DialogTitle>OpenAI settings</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Change these settings to change how the AI generates responses.
-              Changes are automatically saved.
-            </DialogContentText>
-            <Typography sx={{ marginTop: '20px' }}>Temperature</Typography>
-            <Slider
-              sx={{ margin: '0 0 20px 0', maxWidth: '500px' }}
-              value={temperature}
-              onChange={(e, v) => {
-                window.localStorage.setItem('finetune-temperature', v.toString());
-                setTemperature(v as number);
-
-              }}
-              valueLabelDisplay="auto"
-              step={0.01}
-              min={0}
-              max={1}
-            /><br />
-            <Typography>Max Tokens</Typography>
-            <Slider
-              sx={{ maxWidth: '500px' }}
-              value={maxTokens}
-              onChange={(e, v) => {
-                window.localStorage.setItem('finetune-maxtokens', v.toString());
-                setMaxTokens(v as number);
-              }}
-              valueLabelDisplay="auto"
-              step={1}
-              min={10}
-              max={1024}
-            /><br />
-            <FormControl sx={{ margin: '20px 0 30px 0' }}>
-              <InputLabel id="demo-simple-select-label">Model</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                value={model}
-                label="Model"
-                onChange={e => {
-                  const newModel = e.target.value;
-                  window.localStorage.setItem('finetune-model', newModel);
-                  setModel(newModel);
-                }}
-              >
-                <MenuItem value="text-davinci-003">text-davinci-003</MenuItem>
-                <MenuItem value="text-curie-001">text-curie-001</MenuItem>
-                <MenuItem value="text-babbage-001">text-babbage-001</MenuItem>
-                <MenuItem value="text-ada-001">text-ada-001</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              type="text"
-              placeholder="Prompt"
-              label="Prompt"
-              value={prompt}
-              onChange={e => {
-                const newPrompt = e.target.value;
-                window.localStorage.setItem('finetune-prompt', newPrompt);
-                setPrompt(newPrompt);
-              }}
-              fullWidth
-              multiline
-            />
-          </DialogContent>
-        </Dialog>
         {
           tracks &&
           <div className={styles.tracks}>
