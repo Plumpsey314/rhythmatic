@@ -54,34 +54,58 @@ export default function Track(props: any) {
         <p>{artists.map((artist: any) => artist.name).join(', ')}</p>
         <p>{album.name}</p>
       </div>
-      <div className={styles.alts}>
-        <audio src={preview_url} controls />
-        <a href={external_urls['spotify']} target="_blank" rel="noopener noreferrer">
-          Spotify link
-        </a>
-        <p>Popularity: {popularity}/100</p>
-      </div>
       <span className={styles.flexfill} />
-      <div className={styles.save}>
-        {
-          session &&
-          <>
-            {
-              !saved ?
-                <Tooltip title="Save to Spotify" arrow placement="top">
-                  <button onClick={() => saveTrack(id)}>
-                    <AddIcon fontSize="large" />
-                  </button>
-                </Tooltip> :
-                <Tooltip title="Saved!" arrow placement="top">
-                  <div>
-                    <CheckIcon fontSize="large" />
-                  </div>
-                </Tooltip>
-            }
-          </>
+      <audio
+        ref={audioRef}
+        src={preview_url} controls hidden
+      />
+      <button onClick={() => {
+        if (playing) {
+          setPlaying(false);
+          audioRef.current?.pause();
+        } else {
+          setPlaying(true);
+          audioRef.current?.play();
         }
-      </div>
-    </div >
+      }} className={session ? styles.play : `${styles.play} ${styles.lonely}`}>
+        {
+          !playing ?
+            <Image
+              src="/icons/play.svg"
+              width="96"
+              height="96"
+              alt="play.svg"
+            /> :
+            <Image
+              src="/icons/pause.svg"
+              width="96"
+              height="96"
+              alt="pause.svg"
+            />
+        }
+      </button>
+      <ThemeProvider theme={theme}>
+        <div className={styles.save}>
+          {
+            session &&
+            <>
+              {
+                !saved ?
+                  <Tooltip title="Save to Spotify" arrow placement="top">
+                    <button onClick={() => saveTrack(id)}>
+                      <AddIcon fontSize="large" />
+                    </button>
+                  </Tooltip> :
+                  <Tooltip title="Saved!" arrow placement="top">
+                    <div>
+                      <CheckIcon fontSize="large" />
+                    </div>
+                  </Tooltip>
+              }
+            </>
+          }
+        </div>
+      </ThemeProvider>
+    </div>
   );
 }
