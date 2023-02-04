@@ -1,6 +1,6 @@
 .container {
   height: 100%;
-  overflow: hidden !important;
+  overflow: auto;
   background: radial-gradient(62.36% 124.36% at 88.66% 0%, rgba(0, 102, 255, 0.33) 0%, rgba(0, 0, 0, 0.33) 100%), radial-gradient(45.3% 135.72% at 5.78% 8.67%, rgba(36, 0, 255, 0.66) 0%, rgba(0, 0, 0, 0.66) 100%), radial-gradient(59.56% 59.56% at 43.3% 89%, #9E00FF 0%, #000000 100%);
   position: relative;
 
@@ -109,7 +109,7 @@
   .content {
     height: 100%;
     padding: 40px;
-    overflow: auto;
+    margin-bottom: 54px;
 
     >.loading {
       position: absolute;
@@ -167,8 +167,8 @@
         transition: 0.5s;
 
         &.faded {
-          opacity: 0;
           pointer-events: none;
+          display: none;
         }
 
         >div {
@@ -238,17 +238,18 @@
     .tracks {
       flex-direction: column;
       align-items: center;
-      overflow: scroll;
+      overflow: auto;
       display: flex;
       margin: 0 auto;
-      margin-top: -180px;
     }
   }
 
   .copyright {
     position: fixed;
-    right: 8px;
-    bottom: 8px;
+    right: 20px;
+    bottom: 20px;
     margin: 0;
+    color: #fff;
+
   }
 }
