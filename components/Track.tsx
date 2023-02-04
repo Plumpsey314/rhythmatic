@@ -1,16 +1,37 @@
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
-import { Tooltip } from '@mui/material';
-import { useState } from 'react';
+import { createTheme, ThemeProvider, Tooltip } from '@mui/material';
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import styles from '../styles/components/Track.module.scss';
 
 export default function Track(props: any) {
   const {
-    name, id, artists, album, external_urls, genres,
-    preview_url, popularity, duration_ms, session, explicit
+    name, id, artists, album, external_urls,
+    preview_url, session
   } = props;
 
   const [saved, setSaved] = useState(false);
+  const [playing, setPlaying] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    function stopPlaying() {
+      setPlaying(false);
+    }
+    audio.addEventListener('ended', stopPlaying);
+    return () => audio.removeEventListener('ended', stopPlaying);
+  }, [audioRef])
+
+  const theme = createTheme({
+    typography: {
+      fontFamily: "'Clash Grotesk', sans-serif"
+    }
+  });
+
 
   // saves given track to library
   async function saveTrack(id: string) {
