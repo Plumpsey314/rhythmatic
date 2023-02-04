@@ -102,58 +102,91 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <Header session={session} />
+      <Image
+        className={styles.rings}
+        src="/img/rings.svg"
+        width={1691 * 0.7}
+        height={1691 * 0.7}
+        alt="logo.svg"
+      />
+      <div className={styles.logo}>
+        <Image
+          src="/img/logo.svg"
+          width="184"
+          height="24"
+          alt="logo.svg"
+        />
+      </div>
+      {
+        !session ?
+          <button className={styles.signInButton} onClick={() => signIn('spotify')}>
+            Sign in with
+            <Image
+              src="/img/spotify.png"
+              width="36"
+              height="36"
+              alt="spotify.png"
+            />
+          </button> :
+          <button className={styles.signOutButton} onClick={() => signOut()}>
+            <Image
+              src="/icons/signout.svg"
+              width="24"
+              height="24"
+              alt="signout.svg"
+            />
+            Sign Out
+          </button>
+      }
       <div className={styles.content}>
-        {
-          loading &&
-          <div className={styles.loading}>
-            <p>{loading}</p>
-            <LinearProgress />
-          </div>
-        }
-        {
-          tracks &&
-          <div className={styles.reset}>
-            <button onClick={() => {
-              setTracks(undefined);
-            }}>
-              Want to try again? Reset
-            </button>
-          </div>
-        }
-        {
-          (!loading && !tracks) &&
-          <div className={styles.form}>
-            <h1>
+        <div className={loading ? styles.loading : `${styles.loading} ${styles.faded}`}>
+          <p>Finding the groove...</p>
+          <LinearProgress sx={{
+            background: '#fff',
+            height: '6px',
+            borderRadius: '2px',
+            '& .MuiLinearProgress-bar': {
+              background: '#5024ff'
+            }
+          }} />
+        </div>
+        <div className={styles.form}>
+          <div
+            className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
+          >
+            <div>
               <Image
-                className={styles.logo}
-                src="/img/logo.png"
-                width="48"
-                height="48"
-                alt="logo.png"
+                src="/img/logo.svg"
+                width="374"
+                height="51"
+                alt="logo.svg"
               />
-              Finetune
-            </h1>
-            <p>Finetune&trade; combines Spotify and ChatGPT to give you the very best music recommendations! Try it below:</p>
-            <form onSubmit={e => {
-              e.preventDefault();
-              generateSongs();
-            }}>
-              <ThemeProvider theme={theme}>
-                <TextField
-                  type="text"
-                  placeholder="Describe your ideal music..."
-                  value={text}
-                  onChange={e => setText(e.target.value)}
-                  multiline
-                  sx={{ width: '400px' }}
-                  required
-                />
-              </ThemeProvider>
-              <button>Find music for me!</button>
-            </form>
+              <p>combines the power</p>
+            </div>
+            <p>of Spotify and ChatGPT to supercharge your music recommendations. Try it out below!</p>
           </div>
-        }
+          <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
+            e.preventDefault();
+            generateSongs();
+          }}>
+            <input
+              type="text"
+              placeholder={textPlaceholder}
+              value={text}
+              onChange={e => setText(e.target.value)}
+              spellCheck="false"
+              required
+            />
+            <button>
+              <Image
+                src="/icons/bolt.svg"
+                width="36"
+                height="36"
+                alt="bolt.svg"
+              />
+            </button>
+          </form>
+        </div>
         {
           tracks &&
           <div className={styles.tracks}>
