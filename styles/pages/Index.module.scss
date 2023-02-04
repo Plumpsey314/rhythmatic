@@ -82,7 +82,6 @@
 
   .content {
     height: 100%;
-    padding: 40px;
     overflow: auto;
 
     >.loading {
@@ -106,39 +105,32 @@
       }
     }
 
-    >.reset {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 16px;
-
-      >button {
-        padding: 0 40px;
-        height: 56px;
-        font-size: 24px;
-        background: var(--spotify-green);
-        border: 0;
-        color: #fff;
-        border-radius: 32px;
-
-        &:hover {
-          background: var(--spotify-green-alt);
-        }
-      }
-    }
-
     >.form {
       text-align: center;
       display: flex;
       align-items: center;
       flex-direction: column;
       color: #fff;
-      max-width: 660px;
-      margin: 0 auto;
-      margin-top: 120px;
+
+      .smallHidden {
+        @media (max-width: 767.98px) {
+          display: none;
+        }
+      }
+
+      .smallShown {
+        @media (min-width: 768px) {
+          display: none;
+        }
+      }
 
       >.formTitle {
         opacity: 1;
         transition: 0.5s;
+        position: absolute;
+        max-width: 660px;
+        top: 160px;
+        margin: 0 40px;
 
         &.faded {
           opacity: 0;
@@ -149,6 +141,11 @@
           display: flex;
           align-items: flex-end;
           margin-bottom: 12px;
+
+          @media (max-width: 767.98px) {
+            flex-direction: column;
+            align-items: center;
+          }
 
           >p {
             font-size: 32px;
@@ -166,18 +163,31 @@
       }
 
       >form {
-        margin-top: 40px;
         display: flex;
         position: absolute;
-        top: 320px;
+        top: 360px;
         transition: 1s;
 
+        @media (max-width: 767.98px) {
+          top: 400px;
+        }
+
+        @media (max-width: 579px) {
+          top: 440px;
+        }
+
         &.raised {
-          top: -16px;
+          top: 24px;
+          z-index: 10;
+
+          @media (max-width: 1199.98px) {
+            top: 104px;
+          }
         }
 
         >input {
           width: 600px;
+          max-width: calc(100vw - 48px);
           height: 56px;
           background: #111;
           border: 1px solid #444;
@@ -222,8 +232,11 @@
       align-items: center;
       overflow: scroll;
       display: flex;
-      margin: 0 auto;
-      margin-top: -200px;
+      margin: 120px 0 40px 0;
+
+      @media (max-width: 1199.98px) {
+        margin-top: 180px;
+      }
     }
   }
 
@@ -232,5 +245,6 @@
     right: 8px;
     bottom: 8px;
     margin: 0;
+    color: #aaa;
   }
 }

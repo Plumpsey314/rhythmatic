@@ -161,9 +161,12 @@ export default function Home() {
                 height="51"
                 alt="logo.svg"
               />
-              <p>combines the power</p>
+              <p className={styles.smallHidden}>combines the power</p>
             </div>
-            <p>of Spotify and ChatGPT to supercharge your music recommendations. Try it out below!</p>
+            <p>
+              <span className={styles.smallShown}>combines the power </span>
+              of Spotify and ChatGPT to supercharge your music recommendations. Try it out below!
+            </p>
           </div>
           <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
