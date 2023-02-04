@@ -15,8 +15,8 @@
 
   .logo {
     position: absolute;
-    width: 232px;
-    height: 72px;
+    width: 210px;
+    height: 56px;
     left: 24px;
     top: 24px;
     background: #111;
@@ -30,8 +30,8 @@
 
   .signInButton {
     position: absolute;
-    width: 205px;
-    height: 72px;
+    width: 195px;
+    height: 56px;
     top: 24px;
     right: 24px;
     background: #111;
@@ -56,8 +56,8 @@
 
   .signOutButton {
     position: absolute;
-    width: 167px;
-    height: 72px;
+    width: 152px;
+    height: 56px;
     top: 24px;
     right: 24px;
     background: #111;
@@ -173,11 +173,11 @@
         transition: 1s;
 
         &.raised {
-          top: 0;
+          top: -16px;
         }
 
         >input {
-          width: 460px;
+          width: 600px;
           height: 56px;
           background: #111;
           border: 1px solid #444;
@@ -188,6 +188,14 @@
           z-index: 2;
           padding: 12px 52px 12px 12px;
           text-overflow: ellipsis;
+
+          &:active {
+            outline: 2px solid #5024ff;
+          }
+
+          &:focus {
+            outline: 2px solid #5024ff;
+          }
         }
 
         >button {
@@ -215,7 +223,7 @@
       overflow: scroll;
       display: flex;
       margin: 0 auto;
-      margin-top: -180px;
+      margin-top: -200px;
     }
   }
 
