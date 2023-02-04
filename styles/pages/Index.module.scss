@@ -26,11 +26,15 @@
     align-items: center;
     justify-content: center;
     z-index: 5;
+
+    @media (max-width: 499.98px) {
+      display: none;
+    }
   }
 
   .signInButton {
     position: absolute;
-    width: 195px;
+    padding: 0 16px;
     height: 56px;
     top: 24px;
     right: 24px;
@@ -124,6 +128,18 @@
         }
       }
 
+      .tinyHidden {
+        @media (max-width: 499.98px) {
+          display: none;
+        }
+      }
+
+      .tinyShown {
+        @media (min-width: 500px) {
+          display: none;
+        }
+      }
+
       >.formTitle {
         opacity: 1;
         transition: 0.5s;
@@ -141,6 +157,7 @@
           display: flex;
           align-items: flex-end;
           margin-bottom: 12px;
+          max-width: 100vw;
 
           @media (max-width: 767.98px) {
             flex-direction: column;
@@ -157,8 +174,12 @@
 
         >p {
           font-size: 32px;
-          margin: 0;
+          margin: 0 8px;
           line-height: 48px;
+
+          @media (max-width: 499.98px) {
+            font-size: 24px;
+          }
         }
       }
 
@@ -174,6 +195,18 @@
 
         @media (max-width: 579px) {
           top: 440px;
+        }
+
+        @media (max-width: 499.98px) {
+          top: 400px;
+        }
+
+        @media (max-width: 456px) {
+          top: 420px;
+        }
+
+        @media (max-width: 393px) {
+          top: 460px;
         }
 
         &.raised {

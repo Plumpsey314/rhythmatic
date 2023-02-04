@@ -156,9 +156,17 @@ export default function Home() {
           >
             <div>
               <Image
+                className={styles.tinyHidden}
                 src="/img/logo.svg"
                 width="374"
                 height="51"
+                alt="logo.svg"
+              />
+              <Image
+                className={styles.tinyShown}
+                src="/img/logo.svg"
+                width={374 * 0.8}
+                height={51 * 0.8}
                 alt="logo.svg"
               />
               <p className={styles.smallHidden}>combines the power</p>
