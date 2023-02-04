@@ -1,23 +1,38 @@
-import Header from '@/components/Header';
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
-import { createTheme, LinearProgress, TextField, ThemeProvider } from '@mui/material';
-import { useSession } from 'next-auth/react';
+import { LinearProgress } from '@mui/material';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
 
   const [text, setText] = useState("");
+  const [textPlaceholder, setTextPlaceholder] = useState('');
   const [tracks, setTracks] = useState<any[]>();
-  const [loading, setLoading] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const theme = createTheme({
-    typography: {
-      fontFamily: 'Outfit, sans-serif'
-    }
-  });
+  // set up text placeholder typing effect
+  useEffect(() => {
+    const states = ['songs by pink floyd', 'electronic music fun', 'jazz from the 80s', 'rap songs from 2018', 'r&b songs about summer'];
+    let stateIndex = 0;
+    let letterIndex = 0;
+    let countdown = 0;
+    const textInterval = setInterval(() => {
+      if (letterIndex === states[stateIndex].length) {
+        letterIndex = 0;
+        stateIndex += 1;
+        countdown = 16;
+      }
+      if (stateIndex === states.length) stateIndex = 0;
+      if (countdown === 0) {
+        setTextPlaceholder(states[stateIndex].slice(0, letterIndex + 1));
+        letterIndex++;
+      } else countdown--;
+    }, 80);
+    return () => clearInterval(textInterval);
+  }, []);
 
   // gets tracks from spotify with given url
   async function getTracks(url: string) {
@@ -25,7 +40,7 @@ export default function Home() {
     // handle api error
     if (response.status !== 200) {
       window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
-      setLoading(null);
+      setLoading(false);
       return;
     }
     const data = await response.json();
@@ -33,24 +48,27 @@ export default function Home() {
     console.log(items);
     if (!items?.length) {
       window.alert('Spotify found no tracks. Please try a different prompt.');
-      setLoading(null);
+      setLoading(false);
       return;
     }
     setTracks(items);
-    setLoading(null);
+    setLoading(false);
   }
 
   // generates songs from chatgpt
   async function generateSongs() {
     // update loading state
     if (loading) return;
-    setLoading('Sending your preferences to ChatGPT...')
+    setLoading(true);
 
     // return if no text
     if (!text || !text.trim()) {
       window.alert('Please enter some text.');
       return;
     }
+
+    // clear tracks
+    setTracks(undefined);
 
     // make request to chatgpt
     const response = await fetch("/api/openai", {
@@ -61,13 +79,10 @@ export default function Home() {
       body: JSON.stringify({ text })
     });
 
-    // clear text
-    setText('');
-
     // parse json data
     const data = await response.json();
     if (response.status !== 200) {
-      setLoading(null);
+      setLoading(false);
       throw data.error || new Error(`Request failed with status ${response.status}`);
     }
 
@@ -75,7 +90,7 @@ export default function Home() {
     const result = data.result.trim();
     console.log(result);
     if (!result) {
-      setLoading(null);
+      setLoading(false);
       window.alert('ChatGPT returned no result. Please try a different prompt.');
     }
 
