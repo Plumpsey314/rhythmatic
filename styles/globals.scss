@@ -1,10 +1,3 @@
-:root {
-  --header: 80px;
-  --spotify-green: #1db954;
-  --spotify-green-alt: #1ed760;
-  --spotify-black: #191414;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -13,7 +6,7 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Clash Grotesk', sans-serif;
 }
 
 html,
@@ -29,5 +22,9 @@ a {
 
 button {
   cursor: pointer;
-  font-family: 'Outfit', sans-serif;
+}
+
+button,
+input {
+  font-family: 'Clash Grotesk', sans-serif;
 }
