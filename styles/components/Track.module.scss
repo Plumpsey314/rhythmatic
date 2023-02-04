@@ -1,46 +1,40 @@
 .container {
-  background: #efefef;
-  margin: 20px;
+  margin: 6px;
   display: flex;
-  height: 160px;
+  height: 108px;
   border-radius: 24px;
   box-shadow: 0 0 5px #999;
-  padding: 20px;
+  padding: 18px;
   display: flex;
+  width: 700px;
+  background: #111;
+  border: 1px solid #444444;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  z-index: 1;
+  color: #fff;
 
   >img {
     height: 100%;
-    margin-right: 16px;
+    margin-right: 18px;
   }
 
   >.details {
+    min-width: 0;
+
     >h1 {
       margin: 0;
-      line-height: 32px;
+      font-size: 24px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     >p {
-      margin: 8px 0 0 0;
-    }
-  }
-
-  >.alts {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-left: 16px;
-
-    >p {
-      margin: 12px 0 0 0;
-    }
-
-    >a {
-      text-decoration: underline;
-      color: #2196f3;
-
-      &:hover {
-        color: #3f51b5;
-      }
+      margin: 0;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
   }
 
@@ -48,18 +42,33 @@
     flex-grow: 1;
   }
 
+  >.play {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    overflow: hidden;
+
+    &.lonely {
+      margin-right: -16px;
+    }
+  }
+
   >.save {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 20px;
+    margin-left: 12px;
 
     >button,
     >div {
-      width: 64px;
-      height: 64px;
-      border-radius: 48px;
-      background: var(--spotify-green);
+      width: 72px;
+      height: 72px;
+      border-radius: 4px;
+      background: #5042ff;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -70,7 +79,7 @@
       border: 0;
 
       &:hover {
-        background: var(--spotify-green-alt);
+        background: #3c2eff;
       }
     }
   }
