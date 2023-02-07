@@ -2,9 +2,11 @@ import { searchTrack } from '@/util/spotify';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { url } = req.query;
-  if (typeof url !== 'string') throw 'invalid search url';
-  const response = await searchTrack(url);
+  const { song, artist } = req.query;
+  if (typeof song !== 'string' || typeof artist !== 'string') {
+    throw 'invalid search query';
+  }
+  const response = await searchTrack(song, artist);
   // handle ok
   if (response.ok) {
     const data = await response.json();

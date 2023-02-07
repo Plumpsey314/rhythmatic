@@ -34,25 +34,35 @@ export default function Home() {
     return () => clearInterval(textInterval);
   }, []);
 
-  // gets tracks from spotify with given url
-  async function getTracks(url: string) {
-    const response = await fetch(`/api/searchtrack?url=${encodeURIComponent(url)}`);
-    // handle api error
-    if (response.status !== 200) {
-      window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
-      setLoading(false);
-      return;
-    }
-    const data = await response.json();
-    const items = data?.tracks?.items;
-    console.log(items);
-    if (!items?.length) {
-      window.alert('Spotify found no tracks. Please try a different prompt.');
-      setLoading(false);
-      return;
-    }
-    setTracks(items);
+  // gets data for given tracks
+  async function getTracks(tracksData: string[]) {
     setLoading(false);
+    setTracks([]);
+    let index = 0;
+    let allTracks: any[] = [];
+    async function makeRequest(tracksData: string[]) {
+      if (index === tracksData.length) {
+        setTracks(allTracks);
+        return;
+      }
+      const trackData = tracksData[index];
+      const [song, artist] = trackData.split('\n');
+      const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}}`);
+      // handle api error
+      if (response.status !== 200) {
+        window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
+        return;
+      }
+      const data = await response.json();
+      const track = data?.tracks?.items[0];
+      if (track) {
+        setTracks(tracks => tracks ? [...tracks, track] : [track]);
+        allTracks.push(track);
+      }
+      index++;
+      makeRequest(tracksData);
+    }
+    makeRequest(tracksData);
   }
 
   // generates songs from chatgpt
@@ -86,18 +96,31 @@ export default function Home() {
       throw data.error || new Error(`Request failed with status ${response.status}`);
     }
 
-    // check result
-    const result = data.result.trim();
-    console.log(result);
-    if (!result) {
+    console.log(data.result);
+
+    // parse raw result
+    let raw = data.result.trim();
+    const bracketIndex = raw.indexOf('[');
+    if (bracketIndex === -1) {
       setLoading(false);
-      window.alert('ChatGPT returned no result. Please try a different prompt.');
+      window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+      throw 'invalid result';
+    }
+    raw = raw.substring(bracketIndex);
+    console.log(raw);
+
+    // parse song array
+    let songArray: string[];
+    try {
+      songArray = JSON.parse(raw);
+    } catch (e) {
+      setLoading(false);
+      throw `Something went wrong parsing the result: ${e}`;
     }
 
-    // search tracks with result url
-    const url = `https://api.spotify.com/v1/search?q=${result}&type=track&limit=10`;
-    console.log(url);
-    getTracks(url);
+    // get tracks from song data
+    console.log(songArray);
+    getTracks(songArray);
   }
 
   return (
