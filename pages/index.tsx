@@ -135,10 +135,11 @@ export default function Home() {
       <div className={styles.logo}>
         <Image
           src="/img/logo.svg"
-          width="184"
+          width="24"
           height="24"
           alt="logo.svg"
         />
+        <h1>Rhythmatic</h1>
       </div>
       {
         !session ?
@@ -178,20 +179,23 @@ export default function Home() {
             className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
           >
             <div>
-              <Image
-                className={styles.tinyHidden}
-                src="/img/logo.svg"
-                width="374"
-                height="51"
-                alt="logo.svg"
-              />
-              <Image
-                className={styles.tinyShown}
-                src="/img/logo.svg"
-                width={374 * 0.8}
-                height={51 * 0.8}
-                alt="logo.svg"
-              />
+              <div className={styles.titleLogo}>
+                <Image
+                  className={styles.tinyHidden}
+                  src="/img/logo.svg"
+                  width="42"
+                  height="42"
+                  alt="logo.svg"
+                />
+                <Image
+                  className={styles.tinyShown}
+                  src="/img/logo.svg"
+                  width={51 * 0.65}
+                  height={51 * 0.65}
+                  alt="logo.svg"
+                />
+                <h1>Rhythmatic</h1>
+              </div>
               <p className={styles.smallHidden}>combines the power</p>
             </div>
             <p>
@@ -232,9 +236,6 @@ export default function Home() {
           </div>
         }
       </div>
-      <p className={styles.copyright}>
-        &copy; {new Date().getFullYear()} Prodigy Development
-      </p>
     </div>
   );
 }
