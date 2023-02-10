@@ -182,7 +182,30 @@ export default function Home() {
           </button>
       }
       <div className={styles.content}>
-
+        {
+          popupOpen &&
+          <div className={styles.popupContainer}>
+            <div className={styles.popup}>
+              <button onClick={() => setPopupOpen(false)}>
+                &times;
+              </button>
+              <p>Enter your email for updates!</p>
+              <form className={styles.popupForm} onSubmit={e => {
+                e.preventDefault();
+                collectEmail();
+              }}>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="example@domain.com"
+                  required
+                />
+                <button>Submit</button>
+              </form>
+            </div>
+          </div>
+        }
         <div className={loading ? styles.loading : `${styles.loading} ${styles.faded}`}>
           <p>Finding the groove...</p>
           <LinearProgress sx={{
@@ -194,36 +217,6 @@ export default function Home() {
             }
           }} />
         </div>
-        {
-          email ?
-            <div className={styles.haveEmail}>
-              <span className={styles.centerText}>Signed in as <br></br>{email}</span>
-              <button onClick={removeAddress}>Remove address</button>
-            </div>
-          :
-          <div className={styles.popupContainer}>
-            <button onClick={openPopUp} id="popupButton" className={styles.popupButton}> Enter Your Email </button>
-            <div id="emailPopup" className={styles.popup}> 
-              <div className={styles.xContainer}>
-                <div onClick={closePopup} id="popupX" className={styles.popupX}>X</div>
-              </div>
-              <br></br>
-              Enter your email here.
-              <form className={styles.popupForm} onSubmit={e => {
-                  e.preventDefault();
-                  closePopup();
-                  collectEmails();
-                }}>
-                <input 
-                  type="email"
-                  onChange={e => setTempEmail(e.target.value)}
-                />
-                <br></br>
-                <button>Submit</button>
-              </form>
-            </div>
-          </div>
-        }
         <div className={styles.form}>
           <div
             className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
@@ -255,7 +248,7 @@ export default function Home() {
           </div>
           <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
-            closePopup();
+            setPopupOpen(false);
             generateSongs();
           }}>
             <input
@@ -290,26 +283,3 @@ export default function Home() {
     </div>
   );
 }
-
-function openPopUp() {
-  const emailPopup = document.getElementById("emailPopup");
-  if(emailPopup&&emailPopup.classList.contains(styles.hidden)){
-    emailPopup.classList.remove(styles.hidden);
-  }
-  const popupButton = document.getElementById("popupButton");
-  if(popupButton){
-    popupButton.classList.add(styles.hidden);
-  }
-}
-
-function closePopup(){
-  const emailPopup = document.getElementById("emailPopup");
-  if(emailPopup){
-    emailPopup.classList.add(styles.hidden);
-  }
-  const popupButton = document.getElementById("popupButton");
-  if(popupButton&&popupButton.classList.contains(styles.hidden)){
-    popupButton.classList.remove(styles.hidden);
-  }
-}
-
