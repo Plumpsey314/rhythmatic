@@ -3,18 +3,20 @@ import styles from '@/styles/pages/Index.module.scss';
 import { LinearProgress } from '@mui/material';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
 
   const [text, setText] = useState("");
+  const [email, setEmail] = useState("");
   const [textPlaceholder, setTextPlaceholder] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
 
   // set up text placeholder typing effect
   useEffect(() => {
+    openPopUp();
     const states = ['songs by pink floyd', 'electronic music fun', 'jazz from the 80s', 'rap songs from 2018', 'r&b songs about summer'];
     let stateIndex = 0;
     let letterIndex = 0;
@@ -63,6 +65,10 @@ export default function Home() {
       makeRequest(tracksData);
     }
     makeRequest(tracksData);
+  }
+
+  async function collectEmails() {
+    console.log(email);
   }
 
   // generates songs from chatgpt
@@ -174,6 +180,26 @@ export default function Home() {
           }} />
         </div>
         <div className={styles.form}>
+        <button onClick={openPopUp} id="popupButton" className={styles.popupButton}> Enter Your Email </button>
+        <div className={styles.popupContainer}>
+          <div id="emailPopup" className={styles.popup}> 
+            <div onClick={closePopup} id="popupX" className={styles.popupX}>X</div>
+            <br></br>
+            Enter your email here.
+            <form className={styles.popupForm} onSubmit={e => {
+                e.preventDefault();
+                closePopup();
+                collectEmails();
+              }}>
+              <input 
+                type="email"
+                onChange={e => setEmail(e.target.value)}
+              />
+              <br></br>
+              <button>Submit</button>
+            </form>
+          </div>
+        </div>
           <div
             className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
           >
@@ -201,6 +227,7 @@ export default function Home() {
           </div>
           <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
+            closePopup();
             generateSongs();
           }}>
             <input
@@ -238,3 +265,26 @@ export default function Home() {
     </div>
   );
 }
+
+function openPopUp() {
+  const emailPopup = document.getElementById("emailPopup");
+  if(emailPopup&&emailPopup.classList.contains(styles.hidden)){
+    emailPopup.classList.remove(styles.hidden);
+  }
+  const popupButton = document.getElementById("popupButton");
+  if(popupButton){
+    popupButton.classList.add(styles.hidden);
+  }
+}
+
+function closePopup(){
+  const emailPopup = document.getElementById("emailPopup");
+  if(emailPopup){
+    emailPopup.classList.add(styles.hidden);
+  }
+  const popupButton = document.getElementById("popupButton");
+  if(popupButton&&popupButton.classList.contains(styles.hidden)){
+    popupButton.classList.remove(styles.hidden);
+  }
+}
+

@@ -273,6 +273,28 @@
     }
   }
 
+  .hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .popup {
+    display: flex;
+    height: 150px;
+    width: 500px;
+    color: black;
+    background-color: white;
+    border: 3px solid #000;
+    border-radius: 5px;
+    flex-direction: column;
+    position: relative;
+    z-index: 100;
+  }
+
+  .popupX {
+    padding: 10px;
+    text-align: right;
+  }
   .copyright {
     position: fixed;
     right: 8px;
