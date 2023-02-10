@@ -3,18 +3,25 @@ import styles from '@/styles/pages/Index.module.scss';
 import { LinearProgress } from '@mui/material';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
 
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
+  const [email, setEmail] = useState('');
+  const [tempEmail, setTempEmail] = useState('');
   const [textPlaceholder, setTextPlaceholder] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
 
   // set up text placeholder typing effect
   useEffect(() => {
+    openPopUp();
+    const savedEmail = localStorage.getItem('email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+    }
     const states = ['songs by pink floyd', 'electronic music fun', 'jazz from the 80s', 'rap songs from 2018', 'r&b songs about summer'];
     let stateIndex = 0;
     let letterIndex = 0;
@@ -63,6 +70,19 @@ export default function Home() {
       makeRequest(tracksData);
     }
     makeRequest(tracksData);
+  }
+
+  // collects an email and saves it to the user's local storage
+  async function collectEmails() {
+    localStorage.setItem('email', tempEmail);
+    setEmail(tempEmail);
+    //TODO: Save this email in a database
+  }
+
+  // removes the email from the user's local storage
+  async function removeAddress(){
+    localStorage.setItem('email', '');
+    setEmail('');
   }
 
   // generates songs from chatgpt
@@ -163,6 +183,7 @@ export default function Home() {
           </button>
       }
       <div className={styles.content}>
+
         <div className={loading ? styles.loading : `${styles.loading} ${styles.faded}`}>
           <p>Finding the groove...</p>
           <LinearProgress sx={{
@@ -174,6 +195,36 @@ export default function Home() {
             }
           }} />
         </div>
+        {
+          email ?
+            <div className={styles.haveEmail}>
+              <span className={styles.centerText}>Signed in as <br></br>{email}</span>
+              <button onClick={removeAddress}>Remove address</button>
+            </div>
+          :
+          <div className={styles.popupContainer}>
+            <button onClick={openPopUp} id="popupButton" className={styles.popupButton}> Enter Your Email </button>
+            <div id="emailPopup" className={styles.popup}> 
+              <div className={styles.xContainer}>
+                <div onClick={closePopup} id="popupX" className={styles.popupX}>X</div>
+              </div>
+              <br></br>
+              Enter your email here.
+              <form className={styles.popupForm} onSubmit={e => {
+                  e.preventDefault();
+                  closePopup();
+                  collectEmails();
+                }}>
+                <input 
+                  type="email"
+                  onChange={e => setTempEmail(e.target.value)}
+                />
+                <br></br>
+                <button>Submit</button>
+              </form>
+            </div>
+          </div>
+        }
         <div className={styles.form}>
           <div
             className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
@@ -205,6 +256,7 @@ export default function Home() {
           </div>
           <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
+            closePopup();
             generateSongs();
           }}>
             <input
@@ -239,3 +291,26 @@ export default function Home() {
     </div>
   );
 }
+
+function openPopUp() {
+  const emailPopup = document.getElementById("emailPopup");
+  if(emailPopup&&emailPopup.classList.contains(styles.hidden)){
+    emailPopup.classList.remove(styles.hidden);
+  }
+  const popupButton = document.getElementById("popupButton");
+  if(popupButton){
+    popupButton.classList.add(styles.hidden);
+  }
+}
+
+function closePopup(){
+  const emailPopup = document.getElementById("emailPopup");
+  if(emailPopup){
+    emailPopup.classList.add(styles.hidden);
+  }
+  const popupButton = document.getElementById("popupButton");
+  if(popupButton&&popupButton.classList.contains(styles.hidden)){
+    popupButton.classList.remove(styles.hidden);
+  }
+}
+
