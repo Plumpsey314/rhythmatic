@@ -1,27 +1,25 @@
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
 import { LinearProgress } from '@mui/material';
+import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
 
-  const [text, setText] = useState('');
+  const db = getFirestore();
+
   const [email, setEmail] = useState('');
-  const [tempEmail, setTempEmail] = useState('');
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [text, setText] = useState('');
   const [textPlaceholder, setTextPlaceholder] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
 
   // set up text placeholder typing effect
   useEffect(() => {
-    openPopUp();
-    const savedEmail = localStorage.getItem('email');
-    if (savedEmail) {
-      setEmail(savedEmail);
-    }
     const states = ['songs by pink floyd', 'electronic music fun', 'jazz from the 80s', 'rap songs from 2018', 'r&b songs about summer'];
     let stateIndex = 0;
     let letterIndex = 0;
@@ -39,6 +37,12 @@ export default function Home() {
       } else countdown--;
     }, 80);
     return () => clearInterval(textInterval);
+  }, []);
+
+  // handle popup on start
+  useEffect(() => {
+    const localEmail = localStorage.getItem('email');
+    setPopupOpen(!localEmail);
   }, []);
 
   // gets data for given tracks
@@ -72,17 +76,12 @@ export default function Home() {
     makeRequest(tracksData);
   }
 
-  // collects an email and saves it to the user's local storage
-  async function collectEmails() {
-    localStorage.setItem('email', tempEmail);
-    setEmail(tempEmail);
-    //TODO: Save this email in a database
-  }
-
-  // removes the email from the user's local storage
-  async function removeAddress(){
-    localStorage.setItem('email', '');
-    setEmail('');
+  // collects an email and saves it to localstorage and firebase
+  async function collectEmail() {
+    localStorage.setItem('email', email);
+    setPopupOpen(false);
+    const emailsRef = collection(db, 'emails');
+    await addDoc(emailsRef, { email, timestamp: new Date().getTime() });
   }
 
   // generates songs from chatgpt
