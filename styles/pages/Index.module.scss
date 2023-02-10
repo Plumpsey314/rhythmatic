@@ -15,7 +15,7 @@
 
   .logo {
     position: absolute;
-    width: 210px;
+    padding: 0 16px;
     height: 56px;
     left: 24px;
     top: 24px;
@@ -27,8 +27,18 @@
     justify-content: center;
     z-index: 5;
 
-    @media (max-width: 499.98px) {
+    @media (max-width: 513.98px) {
       display: none;
+    }
+
+    >img {
+      margin-right: 4px;
+    }
+
+    >h1 {
+      color: #fff;
+      font-weight: 500;
+      margin: 0;
     }
   }
 
@@ -155,13 +165,33 @@
 
         >div {
           display: flex;
-          align-items: flex-end;
-          margin-bottom: 12px;
+          align-items: center;
+          justify-content: center;
           max-width: 100vw;
 
           @media (max-width: 767.98px) {
             flex-direction: column;
             align-items: center;
+          }
+
+          >.titleLogo {
+            display: flex;
+            align-items: center;
+
+            >img {
+              margin-right: 6px;
+            }
+
+            >h1 {
+              margin: 0;
+              font-weight: 500;
+              font-size: 56px;
+              margin-right: 12px;
+
+              @media (max-width: 470.98px) {
+                font-size: 42px;
+              }
+            }
           }
 
           >p {
@@ -175,10 +205,11 @@
         >p {
           font-size: 32px;
           margin: 0 8px;
-          line-height: 48px;
+          line-height: 52px;
 
-          @media (max-width: 499.98px) {
+          @media (max-width: 513.98px) {
             font-size: 24px;
+            line-height: 44px;
           }
         }
       }
@@ -193,20 +224,16 @@
           top: 400px;
         }
 
-        @media (max-width: 579px) {
+        @media (max-width: 595.98px) {
           top: 440px;
         }
 
-        @media (max-width: 499.98px) {
+        @media (max-width: 513.98px) {
           top: 400px;
         }
 
-        @media (max-width: 456px) {
-          top: 420px;
-        }
-
-        @media (max-width: 393px) {
-          top: 460px;
+        @media (max-width: 470.98px) {
+          top: 440px;
         }
 
         &.raised {
