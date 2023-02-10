@@ -315,9 +315,20 @@
     z-index: 100;
   }
 
+  .popupButton {
+    background-color: #080;
+  }
+
+  .xContainer{
+    display: flex;
+    margin-left: auto;
+  }
+
   .popupX {
     padding: 10px;
     text-align: right;
+    background-color: #f88;
+    height: 45px;
   }
   .copyright {
     position: fixed;

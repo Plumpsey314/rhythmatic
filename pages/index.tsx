@@ -198,13 +198,15 @@ export default function Home() {
           email ?
             <div className={styles.haveEmail}>
               <span className={styles.centerText}>Signed in as <br></br>{email}</span>
-              <button onClick={removeAddress} className={styles.popupButton}>Remove address</button>
+              <button onClick={removeAddress}>Remove address</button>
             </div>
           :
           <div className={styles.popupContainer}>
             <button onClick={openPopUp} id="popupButton" className={styles.popupButton}> Enter Your Email </button>
             <div id="emailPopup" className={styles.popup}> 
-              <div onClick={closePopup} id="popupX" className={styles.popupX}>X</div>
+              <div className={styles.xContainer}>
+                <div onClick={closePopup} id="popupX" className={styles.popupX}>X</div>
+              </div>
               <br></br>
               Enter your email here.
               <form className={styles.popupForm} onSubmit={e => {
