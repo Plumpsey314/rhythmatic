@@ -8,8 +8,9 @@ import { FormEvent, useEffect, useState } from 'react';
 export default function Home() {
   const { data: session } = useSession();
 
-  const [text, setText] = useState("");
-  const [email, setEmail] = useState("");
+  const [text, setText] = useState('');
+  const [email, setEmail] = useState('');
+  const [tempEmail, setTempEmail] = useState('');
   const [textPlaceholder, setTextPlaceholder] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -17,6 +18,10 @@ export default function Home() {
   // set up text placeholder typing effect
   useEffect(() => {
     openPopUp();
+    const savedEmail = localStorage.getItem('email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+    }
     const states = ['songs by pink floyd', 'electronic music fun', 'jazz from the 80s', 'rap songs from 2018', 'r&b songs about summer'];
     let stateIndex = 0;
     let letterIndex = 0;
@@ -67,8 +72,17 @@ export default function Home() {
     makeRequest(tracksData);
   }
 
+  // collects an email and saves it to the user's local storage
   async function collectEmails() {
-    console.log(email);
+    localStorage.setItem('email', tempEmail);
+    setEmail(tempEmail);
+    //TODO: Save this email in a database
+  }
+
+  // removes the email from the user's local storage
+  async function removeAddress(){
+    localStorage.setItem('email', '');
+    setEmail('');
   }
 
   // generates songs from chatgpt
@@ -168,6 +182,7 @@ export default function Home() {
           </button>
       }
       <div className={styles.content}>
+
         <div className={loading ? styles.loading : `${styles.loading} ${styles.faded}`}>
           <p>Finding the groove...</p>
           <LinearProgress sx={{
@@ -179,27 +194,35 @@ export default function Home() {
             }
           }} />
         </div>
-        <div className={styles.form}>
-        <button onClick={openPopUp} id="popupButton" className={styles.popupButton}> Enter Your Email </button>
-        <div className={styles.popupContainer}>
-          <div id="emailPopup" className={styles.popup}> 
-            <div onClick={closePopup} id="popupX" className={styles.popupX}>X</div>
-            <br></br>
-            Enter your email here.
-            <form className={styles.popupForm} onSubmit={e => {
-                e.preventDefault();
-                closePopup();
-                collectEmails();
-              }}>
-              <input 
-                type="email"
-                onChange={e => setEmail(e.target.value)}
-              />
+        {
+          email ?
+            <div className={styles.haveEmail}>
+              <span className={styles.centerText}>Signed in as <br></br>{email}</span>
+              <button onClick={removeAddress} className={styles.popupButton}>Remove address</button>
+            </div>
+          :
+          <div className={styles.popupContainer}>
+            <button onClick={openPopUp} id="popupButton" className={styles.popupButton}> Enter Your Email </button>
+            <div id="emailPopup" className={styles.popup}> 
+              <div onClick={closePopup} id="popupX" className={styles.popupX}>X</div>
               <br></br>
-              <button>Submit</button>
-            </form>
+              Enter your email here.
+              <form className={styles.popupForm} onSubmit={e => {
+                  e.preventDefault();
+                  closePopup();
+                  collectEmails();
+                }}>
+                <input 
+                  type="email"
+                  onChange={e => setTempEmail(e.target.value)}
+                />
+                <br></br>
+                <button>Submit</button>
+              </form>
+            </div>
           </div>
-        </div>
+        }
+        <div className={styles.form}>
           <div
             className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
           >

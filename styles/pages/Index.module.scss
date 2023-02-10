@@ -273,21 +273,45 @@
     }
   }
 
+  .haveEmail {
+    color: #aaa;
+    margin-left: auto;
+    margin-right: auto;
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .centerText{
+    text-align: center;
+  }
+
   .hidden {
     opacity: 0;
     pointer-events: none;
+  }
+
+  .popupContainer{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
   }
 
   .popup {
     display: flex;
     height: 150px;
     width: 500px;
+    flex-direction: column;
     color: black;
     background-color: white;
     border: 3px solid #000;
     border-radius: 5px;
-    flex-direction: column;
+    text-align: center;
     position: relative;
+    top: -16px;
     z-index: 100;
   }
 
