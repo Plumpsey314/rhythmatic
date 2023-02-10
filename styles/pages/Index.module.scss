@@ -300,68 +300,81 @@
     }
   }
 
-  .haveEmail {
-    color: #aaa;
-    margin-left: auto;
-    margin-right: auto;
-    width: 200px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .centerText{
-    text-align: center;
-  }
-
   .hidden {
     opacity: 0;
     pointer-events: none;
   }
 
-  .popupContainer{
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 500px;
-  }
+  .popupContainer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
 
-  .popup {
-    display: flex;
-    height: 150px;
-    width: 500px;
-    flex-direction: column;
-    color: black;
-    background-color: white;
-    border: 3px solid #000;
-    border-radius: 5px;
-    text-align: center;
-    position: relative;
-    top: -16px;
-    z-index: 100;
-  }
+    >.popup {
+      background: #fff;
+      width: 400px;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      box-shadow: 0 0 8px #fff;
+      z-index: 10;
 
-  .popupButton {
-    background-color: #080;
-  }
+      >button {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 24px;
 
-  .xContainer{
-    display: flex;
-    margin-left: auto;
-  }
+        background: rgba(255, 0, 0, 0.3);
 
-  .popupX {
-    padding: 10px;
-    text-align: right;
-    background-color: #f88;
-    height: 45px;
-  }
-  .copyright {
-    position: fixed;
-    right: 8px;
-    bottom: 8px;
-    margin: 0;
-    color: #aaa;
+        &:hover {
+          background: rgba(255, 0, 0, 0.4);
+        }
+      }
+
+      >p {
+        margin: 0 0 8px 0;
+        font-style: italic;
+      }
+
+      >form {
+        >input {
+          border: 2px solid #000;
+          border-right: 0;
+          height: 36px;
+          padding: 0 8px;
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+        }
+
+        >button {
+          border: 2px solid #000;
+          border-left: 0;
+          height: 36px;
+          padding: 0 8px;
+          border-top-right-radius: 8px;
+          border-bottom-right-radius: 8px;
+          background: #2196f3;
+          color: #fff;
+
+          &:hover {
+            background: #0c88ed;
+          }
+        }
+      }
+    }
   }
 }
