@@ -5,3 +5,10 @@ export function getPrompt() {
   prompt += 'You are now to make exactly ten song recommendations based on the following prompt. Here is the prompt:\n\n'
   return prompt;
 }
+
+export function getReprompt(tracks: string) {
+  let prompt = `Refine this list of songs: ${tracks}\n`;
+  prompt += 'Keep it in the same format as a JavaScript array of ten strings with song name and artist separated by \"\\n\".\n';
+  prompt += 'Here is the refining prompt:\n\n';
+  return prompt;
+}
