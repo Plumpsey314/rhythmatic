@@ -1,5 +1,6 @@
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
+import { getPrompt, getReprompt } from '@/util/prompt';
 import { LinearProgress } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { signIn, signOut, useSession } from 'next-auth/react';
@@ -15,6 +16,7 @@ export default function Home() {
   const [popupOpen, setPopupOpen] = useState(false);
   const [text, setText] = useState('');
   const [textPlaceholder, setTextPlaceholder] = useState('');
+  const [lastResponse, setLastResponse] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -85,7 +87,7 @@ export default function Home() {
   }
 
   // generates songs from chatgpt
-  async function generateSongs() {
+  async function generateSongs(reprompting: boolean) {
     // update loading state
     if (loading) return;
     setLoading(true);
@@ -98,6 +100,9 @@ export default function Home() {
 
     // clear tracks
     setTracks(undefined);
+    if (reprompting && !lastResponse) throw 'no last response';
+    const prompt = reprompting ? getReprompt(lastResponse) : getPrompt();
+    console.log(prompt);
 
     // make request to chatgpt
     const response = await fetch("/api/openai", {
@@ -105,7 +110,7 @@ export default function Home() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ text, prompt })
     });
 
     // parse json data
@@ -127,6 +132,7 @@ export default function Home() {
     }
     raw = raw.substring(bracketIndex);
     console.log(raw);
+    setLastResponse(raw);
 
     // parse song array
     let songArray: string[];
@@ -248,8 +254,10 @@ export default function Home() {
           </div>
           <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
+            const reprompting = (e.nativeEvent as any).submitter.name == "reprompt";
+            console.log(`Reprompting? ${reprompting}`);
             setPopupOpen(false);
-            generateSongs();
+            generateSongs(reprompting);
           }}>
             <input
               type="text"
@@ -259,7 +267,18 @@ export default function Home() {
               spellCheck="false"
               required
             />
-            <button>
+            {
+              tracks &&
+              <button name="reprompt" style={{ right: '50px' }}>
+                <Image
+                  src="/icons/reprompt.svg"
+                  width="36"
+                  height="36"
+                  alt="reprompt.svg"
+                />
+              </button>
+            }
+            <button name="bolt">
               <Image
                 src="/icons/bolt.svg"
                 width="36"
