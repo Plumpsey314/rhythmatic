@@ -22,19 +22,39 @@ export default function Home() {
 
   // set up text placeholder typing effect
   useEffect(() => {
-    const states = ['songs by pink floyd', 'electronic music fun', 'jazz from the 80s', 'rap songs from 2018', 'r&b songs about summer'];
+    // TODO: Leighton Schur, change the song samples
+    const states = [
+      'songs by pink floyd',
+      'electronic music fun',
+      'r&b songs about summer',
+      'I love breaking bad so much and I only listen to the breaking bad sound track. But I want some other music like that. Give it to me now RAWR',
+      'Running songs so that I can run SOWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWfast',
+      'OK I need a milk shake with so much protien and then a fire song that will get me this pr bro. I have been workinig on bench pressing and want to lift so much weight before bulking season ends.',
+      'jazz from the 80s',
+      'rap songs from 2018'
+    ];
     let stateIndex = 0;
     let letterIndex = 0;
     let countdown = 0;
+    let startingIndex = 0;
+    let ellipsis = '';
     const textInterval = setInterval(() => {
       if (letterIndex === states[stateIndex].length) {
         letterIndex = 0;
-        stateIndex += 1;
+        stateIndex ++;
         countdown = 16;
+        startingIndex = 0;
+        ellipsis = '';
       }
-      if (stateIndex === states.length) stateIndex = 0;
+      if (stateIndex === states.length) { stateIndex = 0 };
       if (countdown === 0) {
-        setTextPlaceholder(states[stateIndex].slice(0, letterIndex + 1));
+        if(letterIndex > 36){
+          startingIndex++;
+          ellipsis = '... ';
+          // slowed down when there is a lot of text
+          countdown = 1;
+        }
+        setTextPlaceholder(ellipsis + states[stateIndex].slice(startingIndex, letterIndex + 1));
         letterIndex++;
       } else countdown--;
     }, 80);
