@@ -35,3 +35,6 @@ The server automatically refreshes upon changes (provided you save them), so you
 
 To pull changes from github type in the console
 git pull
+and type 
+npm install
+in the console to install any new dependencies
