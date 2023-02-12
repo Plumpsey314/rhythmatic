@@ -1,7 +1,7 @@
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
 import { getPrompt, getReprompt } from '@/util/prompt';
-import { LinearProgress } from '@mui/material';
+import { LinearProgress, Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
@@ -268,23 +268,31 @@ export default function Home() {
             />
             {
               tracks &&
-              <button name="reprompt" style={{ right: '50px' }}>
+              <Tooltip title="Refine songs" arrow>
+                <button
+                  type="button"
+                  style={{ right: '50px' }}
+                  onClick={() => generateSongs(true)}
+                >
+                  <Image
+                    src="/icons/reprompt.svg"
+                    width="36"
+                    height="36"
+                    alt="reprompt.svg"
+                  />
+                </button>
+              </Tooltip>
+            }
+            <Tooltip title="Generate songs" arrow>
+              <button name="bolt">
                 <Image
-                  src="/icons/reprompt.svg"
+                  src="/icons/bolt.svg"
                   width="36"
                   height="36"
-                  alt="reprompt.svg"
+                  alt="bolt.svg"
                 />
               </button>
-            }
-            <button name="bolt">
-              <Image
-                src="/icons/bolt.svg"
-                width="36"
-                height="36"
-                alt="bolt.svg"
-              />
-            </button>
+            </Tooltip>
           </form>
         </div>
         {
