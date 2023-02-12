@@ -102,7 +102,6 @@ export default function Home() {
     setTracks(undefined);
     if (reprompting && !lastResponse) throw 'no last response';
     const prompt = reprompting ? getReprompt(lastResponse) : getPrompt();
-    console.log(prompt);
 
     // make request to chatgpt
     const response = await fetch("/api/openai", {
