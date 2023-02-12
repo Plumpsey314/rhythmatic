@@ -24,14 +24,11 @@ export default function Home() {
   useEffect(() => {
     // TODO: Leighton Schur, change the song samples
     const states = [
-      'songs by pink floyd',
-      'electronic music fun',
-      'r&b songs about summer',
-      'I love breaking bad so much and I only listen to the breaking bad sound track. But I want some other music like that. Give it to me now RAWR',
-      'Running songs so that I can run SOWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWfast',
-      'OK I need a milk shake with so much protien and then a fire song that will get me this pr bro. I have been workinig on bench pressing and want to lift so much weight before bulking season ends.',
-      'jazz from the 80s',
-      'rap songs from 2018'
+      'I am going on a long car ride through the mountains and want music that will keep me from falling asleep',
+      'I want to feel empowered, play me some empowering pop songs',
+      'I\'m having a party and want songs that will keep everyone dancing',
+      'I\'m in the mood for throwback hits from the 90s and 2000s',
+      'I am playing chess and I want music that won\'t distract me but will keep me happy.',
     ];
     let stateIndex = 0;
     let letterIndex = 0;
@@ -39,6 +36,7 @@ export default function Home() {
     let startingIndex = 0;
     let ellipsis = '';
     const textInterval = setInterval(() => {
+      console.log(lastResponse);
       if (letterIndex === states[stateIndex].length) {
         letterIndex = 0;
         stateIndex ++;
