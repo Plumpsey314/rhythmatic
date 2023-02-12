@@ -22,7 +22,6 @@ export default function Home() {
 
   // set up text placeholder typing effect
   useEffect(() => {
-    // TODO: Leighton Schur, change the song samples
     const states = [
       'I am going on a long car ride through the mountains and want music that will keep me from falling asleep',
       'I want to feel empowered, play me some empowering pop songs',
@@ -36,7 +35,6 @@ export default function Home() {
     let startingIndex = 0;
     let ellipsis = '';
     const textInterval = setInterval(() => {
-      console.log(lastResponse);
       if (letterIndex === states[stateIndex].length) {
         letterIndex = 0;
         stateIndex ++;
