@@ -22,7 +22,13 @@ export default function Home() {
 
   // set up text placeholder typing effect
   useEffect(() => {
-    const states = ['songs by pink floyd', 'electronic music fun', 'jazz from the 80s', 'rap songs from 2018', 'r&b songs about summer'];
+    const states = [
+      'I am going on a long car ride through the mountains and want music that will keep me from falling asleep',
+      'I want to feel empowered, play me some empowering pop songs',
+      'I\'m having a party and want a playlist that will keep everyone dancing',
+      'I\'m in the mood for throwback hits from the 90s and 2000s',
+      'I am playing chess and I want music that won\'t distract me but will keep me happy.'
+    ];
     let stateIndex = 0;
     let letterIndex = 0;
     let countdown = 0;
@@ -34,7 +40,8 @@ export default function Home() {
       }
       if (stateIndex === states.length) stateIndex = 0;
       if (countdown === 0) {
-        setTextPlaceholder(states[stateIndex].slice(0, letterIndex + 1));
+        const minIndex = Math.max(0, letterIndex - 40);
+        setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
         letterIndex++;
       } else countdown--;
     }, 80);
@@ -59,6 +66,7 @@ export default function Home() {
         return;
       }
       const trackData = tracksData[index];
+      // console.log(`[${index}]: ${trackData}`);
       const [song, artist] = trackData.split('\n');
       const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}}`);
       // handle api error
@@ -68,6 +76,7 @@ export default function Home() {
       }
       const data = await response.json();
       const track = data?.tracks?.items[0];
+      // console.log(`[${index}]: ${track?.name}`);
       if (track) {
         setTracks(tracks => tracks ? [...tracks, track] : [track]);
         allTracks.push(track);
@@ -119,7 +128,7 @@ export default function Home() {
       throw data.error || new Error(`Request failed with status ${response.status}`);
     }
 
-    console.log(data.result);
+    // console.log(data.result);
 
     // parse raw result
     let raw = data.result.trim();
@@ -130,7 +139,7 @@ export default function Home() {
       throw 'invalid result';
     }
     raw = raw.substring(bracketIndex);
-    console.log(raw);
+    // console.log(raw);
     setLastResponse(raw);
 
     // parse song array
@@ -143,7 +152,7 @@ export default function Home() {
     }
 
     // get tracks from song data
-    console.log(songArray);
+    // console.log(songArray);
     getTracks(songArray);
   }
 
@@ -253,10 +262,8 @@ export default function Home() {
           </div>
           <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
-            const reprompting = (e.nativeEvent as any).submitter.name == "reprompt";
-            console.log(`Reprompting? ${reprompting}`);
             setPopupOpen(false);
-            generateSongs(reprompting);
+            generateSongs(false);
           }}>
             <input
               type="text"
