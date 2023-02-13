@@ -60,7 +60,10 @@ export default function Home() {
       }
       if (stateIndex === states.length) { stateIndex = 0 };
       if (countdown === 0) {
-        const minIndex = Math.max(0, letterIndex - 40);
+        if(letterIndex > 36){
+          countdown = 1;
+        }
+        const minIndex = Math.max(0, letterIndex - 36);
         setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
         letterIndex++;
       } else countdown--;
