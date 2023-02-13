@@ -43,7 +43,6 @@ export default function Home() {
     let countdown = 0;
     let startingIndex = 0;
     let states = promptStates;
-    console.log('happned');
     const textInterval = setInterval(() => {
       if(states==promptStates && document.getElementsByClassName(styles.formTitle)[0].classList.contains(styles.faded)){
         states = repromptStates;
