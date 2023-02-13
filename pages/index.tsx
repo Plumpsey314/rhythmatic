@@ -19,26 +19,46 @@ export default function Home() {
   const [lastResponse, setLastResponse] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
+  const promptStates = [
+    'I am going on a long car ride through the mountains and want music that will keep me from falling asleep',
+    'I want to feel empowered, play me some empowering pop songs',
+    'I\'m having a party and want songs that will keep everyone dancing',
+    'I\'m in the mood for throwback hits from the 90s and 2000s',
+    'I am playing chess and I want music that won\'t distract me but will keep me happy.'
+  ];
+  const repromptStates = [
+    'Only popular rap music though',
+    'Make them sad but still empowering',
+    'Only happy music',
+    'Can you make them sad but still empowering',
+    'Can you only find rap or pop music from after 2020',
+    'Only electronic music though',
+    'Can you make it very chill pop music?'
+  ];
 
   // set up text placeholder typing effect
   useEffect(() => {
-    const states = [
-      'I am going on a long car ride through the mountains and want music that will keep me from falling asleep',
-      'I want to feel empowered, play me some empowering pop songs',
-      'I\'m having a party and want a playlist that will keep everyone dancing',
-      'I\'m in the mood for throwback hits from the 90s and 2000s',
-      'I am playing chess and I want music that won\'t distract me but will keep me happy.'
-    ];
     let stateIndex = 0;
     let letterIndex = 0;
     let countdown = 0;
+    let startingIndex = 0;
+    let states = promptStates;
+    console.log('happned');
     const textInterval = setInterval(() => {
+      if(states==promptStates && document.getElementsByClassName(styles.formTitle)[0].classList.contains(styles.faded)){
+        states = repromptStates;
+        stateIndex = 0;
+        letterIndex = 0;
+        countdown = 0;
+        startingIndex = 0;
+      }
       if (letterIndex === states[stateIndex].length) {
         letterIndex = 0;
-        stateIndex += 1;
+        stateIndex ++;
         countdown = 16;
+        startingIndex = 0;
       }
-      if (stateIndex === states.length) stateIndex = 0;
+      if (stateIndex === states.length) { stateIndex = 0 };
       if (countdown === 0) {
         const minIndex = Math.max(0, letterIndex - 40);
         setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
