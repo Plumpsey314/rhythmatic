@@ -35,7 +35,6 @@ export default function Home() {
     'Only electronic music though',
     'Can you make it very chill pop music?'
   ];
-  let states = promptStates;
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -43,8 +42,16 @@ export default function Home() {
     let letterIndex = 0;
     let countdown = 0;
     let startingIndex = 0;
+    let states = promptStates;
+    console.log('happned');
     const textInterval = setInterval(() => {
-      console.log(states[0][0]);
+      if(states==promptStates && document.getElementsByClassName(styles.formTitle)[0].classList.contains(styles.faded)){
+        states = repromptStates;
+        stateIndex = 0;
+        letterIndex = 0;
+        countdown = 0;
+        startingIndex = 0;
+      }
       if (letterIndex === states[stateIndex].length) {
         letterIndex = 0;
         stateIndex ++;
@@ -73,8 +80,6 @@ export default function Home() {
 
   // gets data for given tracks
   async function getTracks(tracksData: string[]) {
-    states = repromptStates;
-    console.log(states);
     setLoading(false);
     setTracks([]);
     let index = 0;
