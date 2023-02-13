@@ -9,7 +9,12 @@ cloning into rhythmatic
 Go into the rhythmatic folder created via git clone by typing: 
 cd rhythmatic
 You are now in the project root folder.
-Make sure to run all console commands described in the README in this folder.
+Make sure to run all console commands described in the README in this folder.4
+
+Create a new file called .env.local
+This has very important, and secret information(AKA jumbled numbers and letters) you will need to run the project.Due to the
+importance of the security of this file it is not on GitHub and needs to be added manually.
+To get the contents of this file, let Cooper Saye or Nathan Derhake know.
 
 To pull up the terminal, if you are in VSCode press 
 "ctrl+`" You will see some tabs such as PROBLEMS, OUTPUT, or TERMINAL. Make sure you are in the TERMINAL tab.
@@ -35,3 +40,6 @@ The server automatically refreshes upon changes (provided you save them), so you
 
 To pull changes from github type in the console
 git pull
+and type 
+npm install
+in the console to install any new dependencies

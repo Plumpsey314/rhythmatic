@@ -1,7 +1,7 @@
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
 import { getPrompt, getReprompt } from '@/util/prompt';
-import { LinearProgress } from '@mui/material';
+import { LinearProgress, Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
@@ -60,12 +60,8 @@ export default function Home() {
       }
       if (stateIndex === states.length) { stateIndex = 0 };
       if (countdown === 0) {
-        if(letterIndex > 36){
-          startingIndex++;
-          // slowed down when there is a lot of text, so it is easier to read.
-          countdown = 1;
-        }
-        setTextPlaceholder(states[stateIndex].slice(startingIndex, letterIndex + 1));
+        const minIndex = Math.max(0, letterIndex - 40);
+        setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
         letterIndex++;
       } else countdown--;
     }, 80);
@@ -90,6 +86,7 @@ export default function Home() {
         return;
       }
       const trackData = tracksData[index];
+      // console.log(`[${index}]: ${trackData}`);
       const [song, artist] = trackData.split('\n');
       const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}}`);
       // handle api error
@@ -99,6 +96,7 @@ export default function Home() {
       }
       const data = await response.json();
       const track = data?.tracks?.items[0];
+      // console.log(`[${index}]: ${track?.name}`);
       if (track) {
         setTracks(tracks => tracks ? [...tracks, track] : [track]);
         allTracks.push(track);
@@ -133,7 +131,6 @@ export default function Home() {
     setTracks(undefined);
     if (reprompting && !lastResponse) throw 'no last response';
     const prompt = reprompting ? getReprompt(lastResponse) : getPrompt();
-    console.log(prompt);
 
     // make request to chatgpt
     const response = await fetch("/api/openai", {
@@ -151,7 +148,7 @@ export default function Home() {
       throw data.error || new Error(`Request failed with status ${response.status}`);
     }
 
-    console.log(data.result);
+    // console.log(data.result);
 
     // parse raw result
     let raw = data.result.trim();
@@ -162,7 +159,7 @@ export default function Home() {
       throw 'invalid result';
     }
     raw = raw.substring(bracketIndex);
-    console.log(raw);
+    // console.log(raw);
     setLastResponse(raw);
 
     // parse song array
@@ -175,7 +172,7 @@ export default function Home() {
     }
 
     // get tracks from song data
-    console.log(songArray);
+    // console.log(songArray);
     getTracks(songArray);
   }
 
@@ -285,10 +282,8 @@ export default function Home() {
           </div>
           <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
-            const reprompting = (e.nativeEvent as any).submitter.name == "reprompt";
-            console.log(`Reprompting? ${reprompting}`);
             setPopupOpen(false);
-            generateSongs(reprompting);
+            generateSongs(false);
           }}>
             <input
               type="text"
@@ -300,23 +295,31 @@ export default function Home() {
             />
             {
               tracks &&
-              <button name="reprompt" style={{ right: '50px' }}>
+              <Tooltip title="Refine songs" arrow>
+                <button
+                  type="button"
+                  style={{ right: '50px' }}
+                  onClick={() => generateSongs(true)}
+                >
+                  <Image
+                    src="/icons/reprompt.svg"
+                    width="36"
+                    height="36"
+                    alt="reprompt.svg"
+                  />
+                </button>
+              </Tooltip>
+            }
+            <Tooltip title="Generate songs" arrow>
+              <button name="bolt">
                 <Image
-                  src="/icons/reprompt.svg"
+                  src="/icons/bolt.svg"
                   width="36"
                   height="36"
-                  alt="reprompt.svg"
+                  alt="bolt.svg"
                 />
               </button>
-            }
-            <button name="bolt">
-              <Image
-                src="/icons/bolt.svg"
-                width="36"
-                height="36"
-                alt="bolt.svg"
-              />
-            </button>
+            </Tooltip>
           </form>
         </div>
         {
