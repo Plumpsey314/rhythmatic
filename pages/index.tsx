@@ -19,32 +19,32 @@ export default function Home() {
   const [lastResponse, setLastResponse] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
-  const promptStates = [
-    'I am going on a long car ride through the mountains and want music that will keep me from falling asleep',
-    'I want to feel empowered, play me some empowering pop songs',
-    'I\'m having a party and want songs that will keep everyone dancing',
-    'I\'m in the mood for throwback hits from the 90s and 2000s',
-    'I am playing chess and I want music that won\'t distract me but will keep me happy.'
-  ];
-  const repromptStates = [
-    'Only popular rap music though',
-    'Make them sad but still empowering',
-    'Only happy music',
-    'Can you make them sad but still empowering',
-    'Can you only find rap or pop music from after 2020',
-    'Only electronic music though',
-    'Can you make it very chill pop music?'
-  ];
 
   // set up text placeholder typing effect
   useEffect(() => {
+    const promptStates = [
+      'I am going on a long car ride through the mountains and want music that will keep me from falling asleep',
+      'I want to feel empowered, play me some empowering pop songs',
+      'I\'m having a party and want songs that will keep everyone dancing',
+      'I\'m in the mood for throwback hits from the 90s and 2000s',
+      'I am playing chess and I want music that won\'t distract me but will keep me happy.'
+    ];
+    const repromptStates = [
+      'Only popular rap music though',
+      'Make them sad but still empowering',
+      'Only happy music',
+      'Can you make them sad but still empowering',
+      'Can you only find rap or pop music from after 2020',
+      'Only electronic music though',
+      'Can you make it very chill pop music?'
+    ];
     let stateIndex = 0;
     let letterIndex = 0;
     let countdown = 0;
     let startingIndex = 0;
     let states = promptStates;
     const textInterval = setInterval(() => {
-      if(states==promptStates && document.getElementsByClassName(styles.formTitle)[0].classList.contains(styles.faded)){
+      if (states == promptStates && tracks) {
         states = repromptStates;
         stateIndex = 0;
         letterIndex = 0;
@@ -53,22 +53,20 @@ export default function Home() {
       }
       if (letterIndex === states[stateIndex].length) {
         letterIndex = 0;
-        stateIndex ++;
+        stateIndex++;
         countdown = 16;
         startingIndex = 0;
       }
-      if (stateIndex === states.length) { stateIndex = 0 };
+      if (stateIndex === states.length) stateIndex = 0;
       if (countdown === 0) {
-        if(letterIndex > 36){
-          countdown = 1;
-        }
+        if (letterIndex > 36) countdown = 1;
         const minIndex = Math.max(0, letterIndex - 36);
         setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
         letterIndex++;
       } else countdown--;
     }, 80);
     return () => clearInterval(textInterval);
-  }, []);
+  }, [tracks]);
 
   // handle popup on start
   useEffect(() => {
@@ -88,9 +86,8 @@ export default function Home() {
         return;
       }
       const trackData = tracksData[index];
-      // console.log(`[${index}]: ${trackData}`);
       const [song, artist] = trackData.split('\n');
-      const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}}`);
+      const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
       // handle api error
       if (response.status !== 200) {
         window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
@@ -98,7 +95,6 @@ export default function Home() {
       }
       const data = await response.json();
       const track = data?.tracks?.items[0];
-      // console.log(`[${index}]: ${track?.name}`);
       if (track) {
         setTracks(tracks => tracks ? [...tracks, track] : [track]);
         allTracks.push(track);
@@ -150,8 +146,6 @@ export default function Home() {
       throw data.error || new Error(`Request failed with status ${response.status}`);
     }
 
-    // console.log(data.result);
-
     // parse raw result
     let raw = data.result.trim();
     const bracketIndex = raw.indexOf('[');
@@ -161,7 +155,6 @@ export default function Home() {
       throw 'invalid result';
     }
     raw = raw.substring(bracketIndex);
-    // console.log(raw);
     setLastResponse(raw);
 
     // parse song array
@@ -174,7 +167,6 @@ export default function Home() {
     }
 
     // get tracks from song data
-    // console.log(songArray);
     getTracks(songArray);
   }
 
