@@ -271,7 +271,9 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
+      <div className={loading?styles.blackBackground:`${styles.blackBackground} ${styles.faded}`}>
+        <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
+      </div>
       <Image
         className={styles.rings}
         src="/img/rings.svg"
