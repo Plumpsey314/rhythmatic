@@ -37,7 +37,6 @@ export default function Home() {
   ];
 
   const blueLoading = useRef<HTMLDivElement>(null);
-  const body = useRef<typeof document.body>(document.body);
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -91,7 +90,6 @@ export default function Home() {
         return;
       }
       const trackData = tracksData[index];
-      // console.log(`[${index}]: ${trackData}`);
       const [song, artist] = trackData.split('\n');
       const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}}`);
       // handle api error
@@ -101,7 +99,6 @@ export default function Home() {
       }
       const data = await response.json();
       const track = data?.tracks?.items[0];
-      // console.log(`[${index}]: ${track?.name}`);
       if (track) {
         setTracks(tracks => tracks ? [...tracks, track] : [track]);
         allTracks.push(track);
@@ -153,8 +150,6 @@ export default function Home() {
       throw data.error || new Error(`Request failed with status ${response.status}`);
     }
 
-    // console.log(data.result);
-
     // parse raw result
     let raw = data.result.trim();
     const bracketIndex = raw.indexOf('[');
@@ -164,7 +159,6 @@ export default function Home() {
       throw 'invalid result';
     }
     raw = raw.substring(bracketIndex);
-    // console.log(raw);
     setLastResponse(raw);
 
     // parse song array
@@ -177,38 +171,53 @@ export default function Home() {
     }
 
     // get tracks from song data
-    // console.log(songArray);
     getTracks(songArray);
   }
 
   async function loadBox(){
     if(blueLoading.current){
-      
-      let height = 500;
-      let width = 10;
+      const squareLen = 500;
       let top = 0;
       let left = 0;
       blueLoading.current.style.left = '0px';
       blueLoading.current.style.top = '0px'
       console.log(top);
       console.log(left);
-      setInterval(() => {
-        if(left==0){
-          if(top==body.current.offsetHeight){
-            
+      const blueLoadInterval = setInterval(() => {
+        console.log("AAAAAAA");
+        if(blueLoading.current){
+          const height = document.body.offsetHeight;
+          const width = document.body.offsetWidth;
+          if(left==0){
+            if(top==0){
+              top = 0.1;
+              blueLoading.current.style.borderTop='none';
+            }else{
+              if(top+0.01 >= squareLen/height){
+                blueLoading.current.style.borderBottom='5px solid #00f';
+                clearInterval(blueLoadInterval);
+              }else{
+                top += 0.01;
+              }
+            }
           }else{
-            
-          }
-        }else{
 
+          }
+          
+          blueLoading.current.style.left = (left*width) + 'px';
+          blueLoading.current.style.top = (top*height) + 'px';
+
+        }else{
+          throw new Error('loading element has been been modified or destroyed');
         }
-      }, 50);
-    }
+      }, 5);
+    } 
   }
 
   return (
     <div className={styles.container}>
-      <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} `}>
+      <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}>
+      {/* <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline}`}> */}
 
       </div>
       <Image
