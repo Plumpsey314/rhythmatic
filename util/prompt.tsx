@@ -7,7 +7,4 @@ export function getPrompt() {
  
  
 
-export function getReprompt(tracks: string) {
-  let prompt = `Refine the song list using same prompt: ${tracks}. Get updated 10 recommendations in the same format.\n\n`;
-  return prompt;
-}
+export const getReprompt = (tracks: string) => `Refine song list: ${tracks}. Return 10 recommendations as JS arrays [song\\nartist].`;
