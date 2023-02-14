@@ -5,7 +5,7 @@ import { LinearProgress, Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
@@ -35,6 +35,9 @@ export default function Home() {
     'Only electronic music though',
     'Can you make it very chill pop music?'
   ];
+
+  const blueLoading = useRef<HTMLDivElement>(null);
+  const body = useRef<typeof document.body>(document.body);
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -178,8 +181,36 @@ export default function Home() {
     getTracks(songArray);
   }
 
+  async function loadBox(){
+    if(blueLoading.current){
+      
+      let height = 500;
+      let width = 10;
+      let top = 0;
+      let left = 0;
+      blueLoading.current.style.left = '0px';
+      blueLoading.current.style.top = '0px'
+      console.log(top);
+      console.log(left);
+      setInterval(() => {
+        if(left==0){
+          if(top==body.current.offsetHeight){
+            
+          }else{
+            
+          }
+        }else{
+
+        }
+      }, 50);
+    }
+  }
+
   return (
     <div className={styles.container}>
+      <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} `}>
+
+      </div>
       <Image
         className={styles.rings}
         src="/img/rings.svg"
@@ -286,6 +317,7 @@ export default function Home() {
             e.preventDefault();
             setPopupOpen(false);
             generateSongs(false);
+            loadBox();
           }}>
             <input
               type="text"
