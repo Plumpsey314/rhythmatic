@@ -180,15 +180,14 @@ export default function Home() {
       let left = 0;
       blueLoading.current.style.left = '0px';
       blueLoading.current.style.top = '0px'
-      blueLoading.current.style.height = '500px';
+      blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
       blueLoading.current.style.width = '10px';
-      let count = 0;
-      const boxHeightStr =  blueLoading.current.style.height;
-      let boxHeight = parseInt(boxHeightStr.substring(0,boxHeightStr.length-2));
-      const boxWidthStr =  blueLoading.current.style.width;
-      let boxWidth = parseInt(boxWidthStr.substring(0,boxWidthStr.length-2));
       const blueLoadInterval = setInterval(() => {
         if(blueLoading.current){
+          const boxHeightStr =  blueLoading.current.style.height;
+          let boxHeight = +(boxHeightStr.substring(0,boxHeightStr.length-2));
+          const boxWidthStr =  blueLoading.current.style.width;
+          let boxWidth = +(boxWidthStr.substring(0,boxWidthStr.length-2));
           const height = document.body.offsetHeight;
           const width = document.body.offsetWidth;
           if(left==0){
@@ -207,7 +206,6 @@ export default function Home() {
                 if(boxHeight-height/100 > 10){
                   boxHeight -= height/100;
                   boxWidth += width/100;
-                  count++;
                   top=1-boxHeight/height;
                 }else{
                   blueLoading.current.style.borderLeft='none';
@@ -264,7 +262,6 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
-      {/* <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div> */}
       <Image
         className={styles.rings}
         src="/img/rings.svg"
