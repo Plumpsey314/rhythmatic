@@ -176,34 +176,81 @@ export default function Home() {
 
   async function loadBox(){
     if(blueLoading.current){
-      const squareLen = 500;
       let top = 0;
       let left = 0;
       blueLoading.current.style.left = '0px';
       blueLoading.current.style.top = '0px'
-      console.log(top);
-      console.log(left);
+      blueLoading.current.style.height = '500px';
+      blueLoading.current.style.width = '10px';
+      let count = 0;
+      const boxHeightStr =  blueLoading.current.style.height;
+      let boxHeight = parseInt(boxHeightStr.substring(0,boxHeightStr.length-2));
+      const boxWidthStr =  blueLoading.current.style.width;
+      let boxWidth = parseInt(boxWidthStr.substring(0,boxWidthStr.length-2));
       const blueLoadInterval = setInterval(() => {
-        console.log("AAAAAAA");
         if(blueLoading.current){
           const height = document.body.offsetHeight;
           const width = document.body.offsetWidth;
           if(left==0){
-            if(top==0){
-              top = 0.1;
-              blueLoading.current.style.borderTop='none';
+            if(top<=0){
+              blueLoading.current.style.borderLeft='5px solid #00f';
+              if(boxWidth-width/100 > 10){
+                boxHeight += height/100;
+                boxWidth -= width/100;
+              }else{
+                top = 0.01;
+                blueLoading.current.style.borderTop='none';
+              }
             }else{
-              if(top+0.01 >= squareLen/height){
+              if(top+0.01 >= 1-boxHeight/height){
                 blueLoading.current.style.borderBottom='5px solid #00f';
-                clearInterval(blueLoadInterval);
+                if(boxHeight-height/100 > 10){
+                  boxHeight -= height/100;
+                  boxWidth += width/100;
+                  count++;
+                  top=1-boxHeight/height;
+                }else{
+                  blueLoading.current.style.borderLeft='none';
+                  left = 0.01;
+                }
               }else{
                 top += 0.01;
               }
             }
           }else{
-
+            if(top <= 0.001){
+              top=0;
+              blueLoading.current.style.borderTop = '5px solid #00f';
+              if(boxHeight-height/100 > 10){
+                boxHeight -= height/100;
+                boxWidth += width/100;
+                left=1-boxWidth/width;
+              }else{
+                blueLoading.current.style.borderRight='none';
+                left -= 0.01;
+                if(left <= 0){
+                  left = 0;
+                }
+              }
+            }else{
+              if(left+0.01 >= 1-boxWidth/width){
+                blueLoading.current.style.borderRight = '5px solid #00f';
+                if(boxWidth-width/100 > 10){
+                  boxHeight += height/100;
+                  boxWidth -= width/100;
+                  top=1-boxHeight/height;
+                  left=1-boxWidth/width;
+                }else{
+                  blueLoading.current.style.borderBottom='none';
+                  top -= 0.01;
+                }
+              }else{
+                left += 0.01;
+              }
+            }
           }
-          
+          blueLoading.current.style.height = (boxHeight) + 'px';
+          blueLoading.current.style.width = (boxWidth) + 'px';
           blueLoading.current.style.left = (left*width) + 'px';
           blueLoading.current.style.top = (top*height) + 'px';
 
@@ -216,10 +263,8 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}>
-      {/* <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline}`}> */}
-
-      </div>
+      <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
+      {/* <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div> */}
       <Image
         className={styles.rings}
         src="/img/rings.svg"
