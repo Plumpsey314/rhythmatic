@@ -37,6 +37,7 @@ export default function Home() {
   ];
 
   const blueLoading = useRef<HTMLDivElement>(null);
+  const trackElement = useRef<HTMLDivElement>(null);
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -184,6 +185,7 @@ export default function Home() {
       blueLoading.current.style.width = '10px';
       const blueLoadInterval = setInterval(() => {
         if(blueLoading.current){
+          console.log("ADS")
           const boxHeightStr =  blueLoading.current.style.height;
           let boxHeight = +(boxHeightStr.substring(0,boxHeightStr.length-2));
           const boxWidthStr =  blueLoading.current.style.width;
@@ -251,7 +253,15 @@ export default function Home() {
           blueLoading.current.style.width = (boxWidth) + 'px';
           blueLoading.current.style.left = (left*width) + 'px';
           blueLoading.current.style.top = (top*height) + 'px';
-
+          if(blueLoading.current.classList.contains(styles.faded)){
+            blueLoading.current.style.left = '0px';
+            blueLoading.current.style.top = '0px'
+            blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
+            blueLoading.current.style.width = '10px';
+            blueLoading.current.style.border='none';
+            console.log(blueLoading.current)
+            clearInterval(blueLoadInterval);
+          }
         }else{
           throw new Error('loading element has been been modified or destroyed');
         }
@@ -384,7 +394,10 @@ export default function Home() {
                 <button
                   type="button"
                   style={{ right: '50px' }}
-                  onClick={() => generateSongs(true)}
+                  onClick={() => {
+                    generateSongs(true)
+                    loadBox();
+                  }}
                 >
                   <Image
                     src="/icons/reprompt.svg"
