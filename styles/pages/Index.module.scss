@@ -323,6 +323,7 @@
       overflow: scroll;
       display: flex;
       margin: 120px 0 40px 0;
+      overflow: hidden;
 
       @media (max-width: 1199.98px) {
         margin-top: 180px;
