@@ -21,7 +21,8 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const blueLoading = useRef<HTMLDivElement>(null);
-  const blackBackground = useRef<HTMLDivElement>(null)
+  const blackBackground = useRef<HTMLDivElement>(null);
+  const textForm = useRef<HTMLInputElement>(null);
   const songTrack = useRef<HTMLDivElement>(null);
 
   // set up text placeholder typing effect
@@ -175,6 +176,11 @@ export default function Home() {
 
   async function loadBox(){
     if(blueLoading.current){
+      blueLoading.current.focus();
+      if(textForm.current){
+        textForm.current.blur();
+        textForm.current.style.pointerEvents = 'none';
+      }
       let top = 0;
       let left = 0;
       let boxShadowLeft = 3;
@@ -201,7 +207,7 @@ export default function Home() {
             if(top<=0){
               boxShadowLeft = 3;
               boxShadowTop = 3;
-              blueLoading.current.style.borderLeft='5px solid #5024FF';
+              blueLoading.current.style.borderLeft='5px solid #8414a3';
               if(boxWidth-width/100 > 10){
                 boxHeight += height/100;
                 boxWidth -= width/100;
@@ -215,7 +221,7 @@ export default function Home() {
               if(top+0.01 >= 1-boxHeight/height){
                 boxShadowLeft = 3;
                 boxShadowTop = -3;
-                blueLoading.current.style.borderBottom='5px solid #5024FF';
+                blueLoading.current.style.borderBottom='5px solid #8414a3';
                 if(boxHeight-height/100 > 10){
                   boxHeight -= height/100;
                   boxWidth += width/100;
@@ -235,7 +241,7 @@ export default function Home() {
               top=0;
               boxShadowLeft = -3;
               boxShadowTop = 3;
-              blueLoading.current.style.borderTop = '5px solid #5024FF';
+              blueLoading.current.style.borderTop = '5px solid #8414a3';
               if(boxHeight-height/100 > 10){
                 boxHeight -= height/100;
                 boxWidth += width/100;
@@ -253,7 +259,7 @@ export default function Home() {
               if(left+0.01 >= 1-boxWidth/width){
                 boxShadowLeft = -3;
                 boxShadowTop = -3;
-                blueLoading.current.style.borderRight = '5px solid #5024FF';
+                blueLoading.current.style.borderRight = '5px solid #8414a3';
                 if(boxWidth-width/100 > 10){
                   boxHeight += height/100;
                   boxWidth -= width/100;
@@ -270,7 +276,7 @@ export default function Home() {
               }
             }
           }
-          blueLoading.current.style.boxShadow = 'inset ' + boxShadowLeft + 'px ' + boxShadowTop + 'px 6px #2600BF';
+          blueLoading.current.style.boxShadow = 'inset ' + boxShadowLeft + 'px ' + boxShadowTop + 'px 6px #cc14ff';
           blueLoading.current.style.height = (boxHeight) + 'px';
           blueLoading.current.style.width = (boxWidth) + 'px';
           blueLoading.current.style.left = (left*width) + 'px';
@@ -287,7 +293,7 @@ export default function Home() {
         }else{
           throw new Error('loading element has been been modified or destroyed');
         }
-      }, 5);
+      }, 3);
     } 
   }
 
@@ -325,18 +331,15 @@ export default function Home() {
                   blackBackground.current.style.opacity = ((150-count)/100).toString();
                 }
                 if(count ==  50){
-                  setTimeout(() => {
-                    if(blackBackground.current){
-                      blackBackground.current.style.zIndex = '9';
-                      blackBackground.current.classList.add(styles.faded);
-                    }else{
-                      throw new Error('loading elements have been been modified or destroyed');
-                    }
-                  },500);
                   blueLoading.current.style.borderRadius='0px';
                   blueLoading.current.classList.add(styles.faded);
                 }
                 if(count == 150){
+                  if(textForm.current){
+                    textForm.current.style.pointerEvents = 'all';
+                  }
+                  blackBackground.current.style.zIndex = '9';
+                  blackBackground.current.classList.add(styles.faded);
                   clearInterval(fadeBack);
                 }
               }
@@ -450,13 +453,14 @@ export default function Home() {
               of Spotify and ChatGPT to supercharge your music recommendations. Try it out below!
             </p>
           </div>
-          <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
+          <form  className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
             setPopupOpen(false);
             generateSongs(false);
             loadBox();
           }}>
             <input
+              ref={textForm}
               type="text"
               placeholder={textPlaceholder}
               value={text}
@@ -467,7 +471,7 @@ export default function Home() {
             {
               tracks &&
               <Tooltip title="Refine songs" arrow>
-                <button className={loading?styles.faded:styles.submitIcon}
+                <button className={loading?`${styles.submitIcon} ${styles.faded}`:styles.submitIcon}
                   type="button"
                   style={{ right: '50px' }}
                   onClick={() => {
