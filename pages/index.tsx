@@ -23,7 +23,6 @@ export default function Home() {
   const blueLoading = useRef<HTMLDivElement>(null);
   const blackBackground = useRef<HTMLDivElement>(null)
   const songTrack = useRef<HTMLDivElement>(null);
-  const loadiingText = useRef<HTMLDivElement>(null);
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -190,11 +189,6 @@ export default function Home() {
       }else{
         throw new Error('black background element has been modified or destroyed');
       }
-      setTimeout(() => {
-        if(loadiingText.current){
-          loadiingText.current.classList.remove(styles.faded);
-        }
-      }, 700);
       const blueLoadInterval = setInterval(() => {
         if(blueLoading.current){
           const boxHeightStr =  blueLoading.current.style.height;
@@ -287,9 +281,6 @@ export default function Home() {
             blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
             blueLoading.current.style.width = '10px';
             blueLoading.current.style.border='none';
-            if(loadiingText.current){
-              loadiingText.current.classList.add(styles.faded);
-            }
             finishLoad();
             clearInterval(blueLoadInterval);
           }
@@ -326,12 +317,14 @@ export default function Home() {
                   blueLoading.current.style.left=(100+count)*songTrack.current.offsetLeft/100 + 'px';
                   blueLoading.current.style.width=trackWidth-count*(width-trackWidth)/100 + 'px';
                 }
-              }else{
-                if(count > 50){
+                if(count == 0){
                   blackBackground.current.style.zIndex = '7';
+                }
+              }else{
+                if(count > 25){
                   blackBackground.current.style.opacity = ((150-count)/100).toString();
                 }
-                if(count ==  100){
+                if(count ==  50){
                   setTimeout(() => {
                     if(blackBackground.current){
                       blackBackground.current.style.zIndex = '9';
@@ -339,7 +332,7 @@ export default function Home() {
                     }else{
                       throw new Error('loading elements have been been modified or destroyed');
                     }
-                  },1000);
+                  },500);
                   blueLoading.current.style.borderRadius='0px';
                   blueLoading.current.classList.add(styles.faded);
                 }
@@ -349,9 +342,9 @@ export default function Home() {
               }
               count++;
             }else{
-                throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
+                //throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
             }
-          }, 10);
+          }, 5);
         }
       }, 500);
     }else{
@@ -428,9 +421,6 @@ export default function Home() {
             </div>
           </div>
         }
-        <div ref={loadiingText} className={`${styles.loading} ${styles.faded}`}>
-          <p>Finding the groove...</p>
-        </div>
         <div className={styles.form}>
           <div
             className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
