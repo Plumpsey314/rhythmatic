@@ -37,6 +37,7 @@ export default function Home() {
   ];
 
   const blueLoading = useRef<HTMLDivElement>(null);
+  const blackBackground = useRef<HTMLDivElement>(null)
   const trackElement = useRef<HTMLDivElement>(null);
 
   // set up text placeholder typing effect
@@ -183,9 +184,9 @@ export default function Home() {
       blueLoading.current.style.top = '0px'
       blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
       blueLoading.current.style.width = '10px';
+      blueLoading.current.style.border='none';
       const blueLoadInterval = setInterval(() => {
         if(blueLoading.current){
-          console.log("ADS")
           const boxHeightStr =  blueLoading.current.style.height;
           let boxHeight = +(boxHeightStr.substring(0,boxHeightStr.length-2));
           const boxWidthStr =  blueLoading.current.style.width;
@@ -259,7 +260,7 @@ export default function Home() {
             blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
             blueLoading.current.style.width = '10px';
             blueLoading.current.style.border='none';
-            console.log(blueLoading.current)
+            finishLoad();
             clearInterval(blueLoadInterval);
           }
         }else{
@@ -269,9 +270,28 @@ export default function Home() {
     } 
   }
 
+  async function finishLoad(){
+    if(blueLoading.current && blackBackground.current){
+      blackBackground.current.classList.remove(styles.faded);
+      blueLoading.current.classList.remove(styles.faded);
+      blueLoading.current.style.height = '100%';
+      blueLoading.current.style.width = '100%';
+      blueLoading.current.style.border = '5px solid #00f'
+      setTimeout(() => {
+        if(blueLoading.current && blackBackground.current){
+          blackBackground.current.classList.add(styles.faded);
+          blueLoading.current.classList.add(styles.faded);
+        }
+      }, 1000)
+
+    }else{
+      throw new Error('loading elements have been been modified or destroyed');
+    }
+  }
+
   return (
     <div className={styles.container}>
-      <div className={loading?styles.blackBackground:`${styles.blackBackground} ${styles.faded}`}>
+      <div ref={blackBackground} className={loading?styles.blackBackground:`${styles.blackBackground} ${styles.faded}`}>
         <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
       </div>
       <Image
