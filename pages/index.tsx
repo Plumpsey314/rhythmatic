@@ -36,7 +36,6 @@ export default function Home() {
       'Only popular rap music though',
       'Make them sad but still empowering',
       'Only happy music',
-      'Can you make them sad but still empowering',
       'Can you only find rap or pop music from after 2020',
       'Only electronic music though',
       'Can you make it very chill pop music?'
@@ -177,6 +176,8 @@ export default function Home() {
     if(blueLoading.current){
       let top = 0;
       let left = 0;
+      let boxShadowLeft = 3;
+      let boxShadowTop = 0;
       blueLoading.current.style.left = '0px';
       blueLoading.current.style.top = '0px'
       blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
@@ -197,22 +198,30 @@ export default function Home() {
           const width = document.body.offsetWidth;
           if(left==0){
             if(top<=0){
-              blueLoading.current.style.borderLeft='5px solid #00f';
+              boxShadowLeft = 3;
+              boxShadowTop = 3;
+              blueLoading.current.style.borderLeft='5px solid #5024FF';
               if(boxWidth-width/100 > 10){
                 boxHeight += height/100;
                 boxWidth -= width/100;
               }else{
                 top = 0.01;
+                boxShadowLeft = 3;
+                boxShadowTop = 0;
                 blueLoading.current.style.borderTop='none';
               }
             }else{
               if(top+0.01 >= 1-boxHeight/height){
-                blueLoading.current.style.borderBottom='5px solid #00f';
+                boxShadowLeft = 3;
+                boxShadowTop = -3;
+                blueLoading.current.style.borderBottom='5px solid #5024FF';
                 if(boxHeight-height/100 > 10){
                   boxHeight -= height/100;
                   boxWidth += width/100;
                   top=1-boxHeight/height;
                 }else{
+                  boxShadowLeft = 0;
+                  boxShadowTop = -3;
                   blueLoading.current.style.borderLeft='none';
                   left = 0.01;
                 }
@@ -223,12 +232,16 @@ export default function Home() {
           }else{
             if(top <= 0.001){
               top=0;
-              blueLoading.current.style.borderTop = '5px solid #00f';
+              boxShadowLeft = -3;
+              boxShadowTop = 3;
+              blueLoading.current.style.borderTop = '5px solid #5024FF';
               if(boxHeight-height/100 > 10){
                 boxHeight -= height/100;
                 boxWidth += width/100;
                 left=1-boxWidth/width;
               }else{
+                boxShadowLeft = 0;
+                boxShadowTop = 3;
                 blueLoading.current.style.borderRight='none';
                 left -= 0.01;
                 if(left <= 0){
@@ -237,13 +250,17 @@ export default function Home() {
               }
             }else{
               if(left+0.01 >= 1-boxWidth/width){
-                blueLoading.current.style.borderRight = '5px solid #00f';
+                boxShadowLeft = -3;
+                boxShadowTop = -3;
+                blueLoading.current.style.borderRight = '5px solid #5024FF';
                 if(boxWidth-width/100 > 10){
                   boxHeight += height/100;
                   boxWidth -= width/100;
                   top=1-boxHeight/height;
                   left=1-boxWidth/width;
                 }else{
+                  boxShadowLeft = -3;
+                  boxShadowTop = 0;
                   blueLoading.current.style.borderBottom='none';
                   top -= 0.01;
                 }
@@ -252,6 +269,7 @@ export default function Home() {
               }
             }
           }
+          blueLoading.current.style.boxShadow = 'inset ' + boxShadowLeft + 'px ' + boxShadowTop + 'px 6px #2600BF';
           blueLoading.current.style.height = (boxHeight) + 'px';
           blueLoading.current.style.width = (boxWidth) + 'px';
           blueLoading.current.style.left = (left*width) + 'px';
@@ -279,6 +297,7 @@ export default function Home() {
       blueLoading.current.style.height = '100%';
       blueLoading.current.style.width = '100%';
       blueLoading.current.style.border = '5px solid #00f'
+      blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
       setTimeout(() => {
         if(blueLoading.current && blackBackground.current){
           let opacityCount = 100;
@@ -300,7 +319,6 @@ export default function Home() {
         }
         console.log(document.getElementsByClassName(styles.container));
       }, 1000)
-
     }else{
       throw new Error('loading elements have been been modified or destroyed');
     }
@@ -310,6 +328,8 @@ export default function Home() {
     <div className={styles.container}>
       <div ref={blackBackground} className={loading?styles.blackBackground:`${styles.blackBackground} ${styles.faded}`}>
         <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
+        {/* <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} `}> </div> */}
+
       </div>
       <Image
         className={styles.rings}
