@@ -5,7 +5,7 @@ import { LinearProgress, Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
@@ -19,6 +19,9 @@ export default function Home() {
   const [lastResponse, setLastResponse] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
+
+  const blueLoading = useRef<HTMLDivElement>(null);
+  const blackBackground = useRef<HTMLDivElement>(null)
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -170,8 +173,124 @@ export default function Home() {
     getTracks(songArray);
   }
 
+  async function loadBox(){
+    if(blueLoading.current){
+      let top = 0;
+      let left = 0;
+      blueLoading.current.style.left = '0px';
+      blueLoading.current.style.top = '0px'
+      blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
+      blueLoading.current.style.width = '10px';
+      blueLoading.current.style.border='none';
+      const blueLoadInterval = setInterval(() => {
+        if(blueLoading.current){
+          const boxHeightStr =  blueLoading.current.style.height;
+          let boxHeight = +(boxHeightStr.substring(0,boxHeightStr.length-2));
+          const boxWidthStr =  blueLoading.current.style.width;
+          let boxWidth = +(boxWidthStr.substring(0,boxWidthStr.length-2));
+          const height = document.body.offsetHeight;
+          const width = document.body.offsetWidth;
+          if(left==0){
+            if(top<=0){
+              blueLoading.current.style.borderLeft='5px solid #00f';
+              if(boxWidth-width/100 > 10){
+                boxHeight += height/100;
+                boxWidth -= width/100;
+              }else{
+                top = 0.01;
+                blueLoading.current.style.borderTop='none';
+              }
+            }else{
+              if(top+0.01 >= 1-boxHeight/height){
+                blueLoading.current.style.borderBottom='5px solid #00f';
+                if(boxHeight-height/100 > 10){
+                  boxHeight -= height/100;
+                  boxWidth += width/100;
+                  top=1-boxHeight/height;
+                }else{
+                  blueLoading.current.style.borderLeft='none';
+                  left = 0.01;
+                }
+              }else{
+                top += 0.01;
+              }
+            }
+          }else{
+            if(top <= 0.001){
+              top=0;
+              blueLoading.current.style.borderTop = '5px solid #00f';
+              if(boxHeight-height/100 > 10){
+                boxHeight -= height/100;
+                boxWidth += width/100;
+                left=1-boxWidth/width;
+              }else{
+                blueLoading.current.style.borderRight='none';
+                left -= 0.01;
+                if(left <= 0){
+                  left = 0;
+                }
+              }
+            }else{
+              if(left+0.01 >= 1-boxWidth/width){
+                blueLoading.current.style.borderRight = '5px solid #00f';
+                if(boxWidth-width/100 > 10){
+                  boxHeight += height/100;
+                  boxWidth -= width/100;
+                  top=1-boxHeight/height;
+                  left=1-boxWidth/width;
+                }else{
+                  blueLoading.current.style.borderBottom='none';
+                  top -= 0.01;
+                }
+              }else{
+                left += 0.01;
+              }
+            }
+          }
+          blueLoading.current.style.height = (boxHeight) + 'px';
+          blueLoading.current.style.width = (boxWidth) + 'px';
+          blueLoading.current.style.left = (left*width) + 'px';
+          blueLoading.current.style.top = (top*height) + 'px';
+          if(blueLoading.current.classList.contains(styles.faded)){
+            blueLoading.current.style.left = '0px';
+            blueLoading.current.style.top = '0px'
+            blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
+            blueLoading.current.style.width = '10px';
+            blueLoading.current.style.border='none';
+            finishLoad();
+            clearInterval(blueLoadInterval);
+          }
+        }else{
+          throw new Error('loading element has been been modified or destroyed');
+        }
+      }, 5);
+    } 
+  }
+
+  async function finishLoad(){
+    if(blueLoading.current && blackBackground.current){
+      blackBackground.current.classList.remove(styles.faded);
+      blueLoading.current.classList.remove(styles.faded);
+      blueLoading.current.style.height = '100%';
+      blueLoading.current.style.width = '100%';
+      blueLoading.current.style.border = '5px solid #00f'
+      setTimeout(() => {
+        if(blueLoading.current && blackBackground.current){
+          blackBackground.current.classList.add(styles.faded);
+          blueLoading.current.classList.add(styles.faded);
+        }
+      }, 1000)
+
+    }else{
+      throw new Error('loading elements have been been modified or destroyed');
+    }
+  }
+
   return (
     <div className={styles.container}>
+      <div ref={blackBackground} className={loading?styles.blackBackground:`${styles.blackBackground} ${styles.faded}`}>
+        <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
+      </div>
       <Image
         className={styles.rings}
         src="/img/rings.svg"
@@ -236,14 +355,6 @@ export default function Home() {
         }
         <div className={loading ? styles.loading : `${styles.loading} ${styles.faded}`}>
           <p>Finding the groove...</p>
-          <LinearProgress sx={{
-            background: '#fff',
-            height: '6px',
-            borderRadius: '2px',
-            '& .MuiLinearProgress-bar': {
-              background: '#5024ff'
-            }
-          }} />
         </div>
         <div className={styles.form}>
           <div
@@ -278,6 +389,7 @@ export default function Home() {
             e.preventDefault();
             setPopupOpen(false);
             generateSongs(false);
+            loadBox();
           }}>
             <input
               type="text"
@@ -293,7 +405,10 @@ export default function Home() {
                 <button
                   type="button"
                   style={{ right: '50px' }}
-                  onClick={() => generateSongs(true)}
+                  onClick={() => {
+                    generateSongs(true)
+                    loadBox();
+                  }}
                 >
                   <Image
                     src="/icons/reprompt.svg"
