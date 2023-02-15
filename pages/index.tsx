@@ -5,7 +5,7 @@ import { LinearProgress, Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
@@ -20,6 +20,11 @@ export default function Home() {
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
 
+  const blueLoading = useRef<HTMLDivElement>(null);
+  const blackBackground = useRef<HTMLDivElement>(null)
+  const songTrack = useRef<HTMLDivElement>(null);
+  const loadiingText = useRef<HTMLDivElement>(null);
+
   // set up text placeholder typing effect
   useEffect(() => {
     const promptStates = [
@@ -33,7 +38,6 @@ export default function Home() {
       'Only popular rap music though',
       'Make them sad but still empowering',
       'Only happy music',
-      'Can you make them sad but still empowering',
       'Can you only find rap or pop music from after 2020',
       'Only electronic music though',
       'Can you make it very chill pop music?'
@@ -170,8 +174,198 @@ export default function Home() {
     getTracks(songArray);
   }
 
+  async function loadBox(){
+    if(blueLoading.current){
+      let top = 0;
+      let left = 0;
+      let boxShadowLeft = 3;
+      let boxShadowTop = 0;
+      blueLoading.current.style.left = '0px';
+      blueLoading.current.style.top = '0px'
+      blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
+      blueLoading.current.style.width = '10px';
+      blueLoading.current.style.border='none';
+      if(blackBackground.current){
+        blackBackground.current.style.opacity = '1';
+      }else{
+        throw new Error('black background element has been modified or destroyed');
+      }
+      setTimeout(() => {
+        if(loadiingText.current){
+          loadiingText.current.classList.remove(styles.faded);
+        }
+      }, 700);
+      const blueLoadInterval = setInterval(() => {
+        if(blueLoading.current){
+          const boxHeightStr =  blueLoading.current.style.height;
+          let boxHeight = +(boxHeightStr.substring(0,boxHeightStr.length-2));
+          const boxWidthStr =  blueLoading.current.style.width;
+          let boxWidth = +(boxWidthStr.substring(0,boxWidthStr.length-2));
+          const height = document.body.offsetHeight;
+          const width = document.body.offsetWidth;
+          if(left==0){
+            if(top<=0){
+              boxShadowLeft = 3;
+              boxShadowTop = 3;
+              blueLoading.current.style.borderLeft='5px solid #5024FF';
+              if(boxWidth-width/100 > 10){
+                boxHeight += height/100;
+                boxWidth -= width/100;
+              }else{
+                top = 0.01;
+                boxShadowLeft = 3;
+                boxShadowTop = 0;
+                blueLoading.current.style.borderTop='none';
+              }
+            }else{
+              if(top+0.01 >= 1-boxHeight/height){
+                boxShadowLeft = 3;
+                boxShadowTop = -3;
+                blueLoading.current.style.borderBottom='5px solid #5024FF';
+                if(boxHeight-height/100 > 10){
+                  boxHeight -= height/100;
+                  boxWidth += width/100;
+                  top=1-boxHeight/height;
+                }else{
+                  boxShadowLeft = 0;
+                  boxShadowTop = -3;
+                  blueLoading.current.style.borderLeft='none';
+                  left = 0.01;
+                }
+              }else{
+                top += 0.01;
+              }
+            }
+          }else{
+            if(top <= 0.001){
+              top=0;
+              boxShadowLeft = -3;
+              boxShadowTop = 3;
+              blueLoading.current.style.borderTop = '5px solid #5024FF';
+              if(boxHeight-height/100 > 10){
+                boxHeight -= height/100;
+                boxWidth += width/100;
+                left=1-boxWidth/width;
+              }else{
+                boxShadowLeft = 0;
+                boxShadowTop = 3;
+                blueLoading.current.style.borderRight='none';
+                left -= 0.01;
+                if(left <= 0){
+                  left = 0;
+                }
+              }
+            }else{
+              if(left+0.01 >= 1-boxWidth/width){
+                boxShadowLeft = -3;
+                boxShadowTop = -3;
+                blueLoading.current.style.borderRight = '5px solid #5024FF';
+                if(boxWidth-width/100 > 10){
+                  boxHeight += height/100;
+                  boxWidth -= width/100;
+                  top=1-boxHeight/height;
+                  left=1-boxWidth/width;
+                }else{
+                  boxShadowLeft = -3;
+                  boxShadowTop = 0;
+                  blueLoading.current.style.borderBottom='none';
+                  top -= 0.01;
+                }
+              }else{
+                left += 0.01;
+              }
+            }
+          }
+          blueLoading.current.style.boxShadow = 'inset ' + boxShadowLeft + 'px ' + boxShadowTop + 'px 6px #2600BF';
+          blueLoading.current.style.height = (boxHeight) + 'px';
+          blueLoading.current.style.width = (boxWidth) + 'px';
+          blueLoading.current.style.left = (left*width) + 'px';
+          blueLoading.current.style.top = (top*height) + 'px';
+          if(blueLoading.current.classList.contains(styles.faded)){
+            blueLoading.current.style.left = '0px';
+            blueLoading.current.style.top = '0px'
+            blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
+            blueLoading.current.style.width = '10px';
+            blueLoading.current.style.border='none';
+            if(loadiingText.current){
+              loadiingText.current.classList.add(styles.faded);
+            }
+            finishLoad();
+            clearInterval(blueLoadInterval);
+          }
+        }else{
+          throw new Error('loading element has been been modified or destroyed');
+        }
+      }, 5);
+    } 
+  }
+
+  async function finishLoad(){
+    if(blueLoading.current && blackBackground.current){
+      blackBackground.current.classList.remove(styles.faded);
+      blueLoading.current.classList.remove(styles.faded);
+      blueLoading.current.style.height = '100%';
+      blueLoading.current.style.width = '100%';
+      blueLoading.current.style.border = '5px solid #00f'
+      blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
+      setTimeout(() => {
+        if(blueLoading.current && blackBackground.current){
+          let count = -100;
+          blueLoading.current.style.borderRadius='8px';
+          const fadeBack = setInterval(() => {
+            if(blueLoading.current&&blackBackground.current&&songTrack.current){
+              if(count <= 0){
+                if(songTrack.current){
+                  songTrack.current.style.zIndex = '10';
+                  const height = document.body.offsetHeight;
+                  const width = document.body.offsetWidth;
+                  const trackHeight = songTrack.current.offsetHeight;
+                  const trackWidth = songTrack.current.offsetWidth;
+                  blueLoading.current.style.top=(100+count)*songTrack.current.offsetTop/100 + 'px';
+                  blueLoading.current.style.height=trackHeight-count*(height-trackHeight)/100 + 'px';
+                  blueLoading.current.style.left=(100+count)*songTrack.current.offsetLeft/100 + 'px';
+                  blueLoading.current.style.width=trackWidth-count*(width-trackWidth)/100 + 'px';
+                }
+              }else{
+                if(count > 50){
+                  blackBackground.current.style.zIndex = '7';
+                  blackBackground.current.style.opacity = ((150-count)/100).toString();
+                }
+                if(count ==  100){
+                  setTimeout(() => {
+                    if(blackBackground.current){
+                      blackBackground.current.style.zIndex = '9';
+                      blackBackground.current.classList.add(styles.faded);
+                    }else{
+                      throw new Error('loading elements have been been modified or destroyed');
+                    }
+                  },1000);
+                  blueLoading.current.style.borderRadius='0px';
+                  blueLoading.current.classList.add(styles.faded);
+                }
+                if(count == 150){
+                  clearInterval(fadeBack);
+                }
+              }
+              count++;
+            }else{
+                throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
+            }
+          }, 10);
+        }
+      }, 500);
+    }else{
+      throw new Error('loading elements have been been modified or destroyed');
+    }
+  }
+
   return (
     <div className={styles.container}>
+      <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
+      <div ref={blackBackground} className={loading?styles.blackBackground:`${styles.blackBackground} ${styles.faded}`}>
+        {/* <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} `}> </div> */}
+
+      </div>
       <Image
         className={styles.rings}
         src="/img/rings.svg"
@@ -234,16 +428,8 @@ export default function Home() {
             </div>
           </div>
         }
-        <div className={loading ? styles.loading : `${styles.loading} ${styles.faded}`}>
+        <div ref={loadiingText} className={`${styles.loading} ${styles.faded}`}>
           <p>Finding the groove...</p>
-          <LinearProgress sx={{
-            background: '#fff',
-            height: '6px',
-            borderRadius: '2px',
-            '& .MuiLinearProgress-bar': {
-              background: '#5024ff'
-            }
-          }} />
         </div>
         <div className={styles.form}>
           <div
@@ -278,6 +464,7 @@ export default function Home() {
             e.preventDefault();
             setPopupOpen(false);
             generateSongs(false);
+            loadBox();
           }}>
             <input
               type="text"
@@ -290,10 +477,13 @@ export default function Home() {
             {
               tracks &&
               <Tooltip title="Refine songs" arrow>
-                <button
+                <button className={loading?styles.faded:styles.submitIcon}
                   type="button"
                   style={{ right: '50px' }}
-                  onClick={() => generateSongs(true)}
+                  onClick={() => {
+                    generateSongs(true)
+                    loadBox();
+                  }}
                 >
                   <Image
                     src="/icons/reprompt.svg"
@@ -305,7 +495,7 @@ export default function Home() {
               </Tooltip>
             }
             <Tooltip title="Generate songs" arrow>
-              <button name="bolt">
+              <button className={loading?`${styles.submitIcon} ${styles.faded}`:styles.submitIcon} name="bolt">
                 <Image
                   src="/icons/bolt.svg"
                   width="36"
@@ -321,7 +511,9 @@ export default function Home() {
           <div className={styles.tracks}>
             {
               tracks.map((track, i) =>
-                <Track session={session} {...track} key={i} />
+                <div ref={i==0?songTrack:null} key={i}>
+                  <Track session={session} {...track} key={i} />
+                </div>
               )
             }
           </div>
