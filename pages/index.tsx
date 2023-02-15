@@ -358,14 +358,6 @@ export default function Home() {
         }
         <div className={loading ? styles.loading : `${styles.loading} ${styles.faded}`}>
           <p>Finding the groove...</p>
-          <LinearProgress sx={{
-            background: '#fff',
-            height: '6px',
-            borderRadius: '2px',
-            '& .MuiLinearProgress-bar': {
-              background: '#5024ff'
-            }
-          }} />
         </div>
         <div className={styles.form}>
           <div
