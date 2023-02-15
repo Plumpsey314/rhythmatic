@@ -442,7 +442,7 @@ export default function Home() {
             {
               tracks &&
               <Tooltip title="Refine songs" arrow>
-                <button
+                <button className={loading?styles.faded:styles.submitIcon}
                   type="button"
                   style={{ right: '50px' }}
                   onClick={() => {
@@ -460,7 +460,7 @@ export default function Home() {
               </Tooltip>
             }
             <Tooltip title="Generate songs" arrow>
-              <button name="bolt">
+              <button className={loading?`${styles.submitIcon} ${styles.faded}`:styles.submitIcon} name="bolt">
                 <Image
                   src="/icons/bolt.svg"
                   width="36"
