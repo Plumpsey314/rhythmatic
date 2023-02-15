@@ -207,7 +207,7 @@ export default function Home() {
             if(top<=0){
               boxShadowLeft = 3;
               boxShadowTop = 3;
-              blueLoading.current.style.borderLeft='5px solid #8414a3';
+              blueLoading.current.style.borderLeft='5px solid #5024FF';
               if(boxWidth-width/100 > 10){
                 boxHeight += height/100;
                 boxWidth -= width/100;
@@ -221,7 +221,7 @@ export default function Home() {
               if(top+0.01 >= 1-boxHeight/height){
                 boxShadowLeft = 3;
                 boxShadowTop = -3;
-                blueLoading.current.style.borderBottom='5px solid #8414a3';
+                blueLoading.current.style.borderBottom='5px solid #5024FF';
                 if(boxHeight-height/100 > 10){
                   boxHeight -= height/100;
                   boxWidth += width/100;
@@ -241,7 +241,7 @@ export default function Home() {
               top=0;
               boxShadowLeft = -3;
               boxShadowTop = 3;
-              blueLoading.current.style.borderTop = '5px solid #8414a3';
+              blueLoading.current.style.borderTop = '5px solid #5024FF';
               if(boxHeight-height/100 > 10){
                 boxHeight -= height/100;
                 boxWidth += width/100;
@@ -259,7 +259,7 @@ export default function Home() {
               if(left+0.01 >= 1-boxWidth/width){
                 boxShadowLeft = -3;
                 boxShadowTop = -3;
-                blueLoading.current.style.borderRight = '5px solid #8414a3';
+                blueLoading.current.style.borderRight = '5px solid #5024FF';
                 if(boxWidth-width/100 > 10){
                   boxHeight += height/100;
                   boxWidth -= width/100;
@@ -276,7 +276,7 @@ export default function Home() {
               }
             }
           }
-          blueLoading.current.style.boxShadow = 'inset ' + boxShadowLeft + 'px ' + boxShadowTop + 'px 6px #cc14ff';
+          blueLoading.current.style.boxShadow = 'inset ' + boxShadowLeft + 'px ' + boxShadowTop + 'px 6px #2600BF';
           blueLoading.current.style.height = (boxHeight) + 'px';
           blueLoading.current.style.width = (boxWidth) + 'px';
           blueLoading.current.style.left = (left*width) + 'px';
