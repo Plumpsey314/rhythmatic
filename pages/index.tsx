@@ -182,6 +182,11 @@ export default function Home() {
       blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
       blueLoading.current.style.width = '10px';
       blueLoading.current.style.border='none';
+      if(blackBackground.current){
+        blackBackground.current.style.opacity = '1';
+      }else{
+        throw new Error('black background element has been modified or destroyed');
+      }
       const blueLoadInterval = setInterval(() => {
         if(blueLoading.current){
           const boxHeightStr =  blueLoading.current.style.height;
@@ -276,9 +281,24 @@ export default function Home() {
       blueLoading.current.style.border = '5px solid #00f'
       setTimeout(() => {
         if(blueLoading.current && blackBackground.current){
+          let opacityCount = 100;
+          const fadeBack = setInterval(() => {
+            if(blackBackground.current){
+              blackBackground.current.style.opacity = (opacityCount/100).toString();
+              opacityCount--;
+              if(opacityCount == 0){
+                blackBackground.current.classList.add(styles.faded);
+                clearInterval(fadeBack);
+              }
+            }else{
+              throw new Error('black background element has been modified or destroyed');
+            }
+          }, 10);
           blackBackground.current.classList.add(styles.faded);
+
           blueLoading.current.classList.add(styles.faded);
         }
+        console.log(document.getElementsByClassName(styles.container));
       }, 1000)
 
     }else{
