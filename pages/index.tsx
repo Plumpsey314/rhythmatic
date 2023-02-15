@@ -38,7 +38,6 @@ export default function Home() {
 
   const blueLoading = useRef<HTMLDivElement>(null);
   const blackBackground = useRef<HTMLDivElement>(null)
-  const trackElement = useRef<HTMLDivElement>(null);
 
   // set up text placeholder typing effect
   useEffect(() => {
