@@ -22,6 +22,8 @@ export default function Home() {
 
   const blueLoading = useRef<HTMLDivElement>(null);
   const blackBackground = useRef<HTMLDivElement>(null)
+  const songTrack = useRef<HTMLDivElement>(null);
+  const loadiingText = useRef<HTMLDivElement>(null);
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -188,6 +190,11 @@ export default function Home() {
       }else{
         throw new Error('black background element has been modified or destroyed');
       }
+      setTimeout(() => {
+        if(loadiingText.current){
+          loadiingText.current.classList.remove(styles.faded);
+        }
+      }, 700);
       const blueLoadInterval = setInterval(() => {
         if(blueLoading.current){
           const boxHeightStr =  blueLoading.current.style.height;
@@ -280,6 +287,9 @@ export default function Home() {
             blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
             blueLoading.current.style.width = '10px';
             blueLoading.current.style.border='none';
+            if(loadiingText.current){
+              loadiingText.current.classList.add(styles.faded);
+            }
             finishLoad();
             clearInterval(blueLoadInterval);
           }
@@ -300,25 +310,50 @@ export default function Home() {
       blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
       setTimeout(() => {
         if(blueLoading.current && blackBackground.current){
-          let opacityCount = 100;
+          let count = -100;
+          blueLoading.current.style.borderRadius='8px';
           const fadeBack = setInterval(() => {
-            if(blackBackground.current){
-              blackBackground.current.style.opacity = (opacityCount/100).toString();
-              opacityCount--;
-              if(opacityCount == 0){
-                blackBackground.current.classList.add(styles.faded);
-                clearInterval(fadeBack);
+            if(blueLoading.current&&blackBackground.current&&songTrack.current){
+              if(count <= 0){
+                if(songTrack.current){
+                  songTrack.current.style.zIndex = '10';
+                  const height = document.body.offsetHeight;
+                  const width = document.body.offsetWidth;
+                  const trackHeight = songTrack.current.offsetHeight;
+                  const trackWidth = songTrack.current.offsetWidth;
+                  blueLoading.current.style.top=(100+count)*songTrack.current.offsetTop/100 + 'px';
+                  blueLoading.current.style.height=trackHeight-count*(height-trackHeight)/100 + 'px';
+                  blueLoading.current.style.left=(100+count)*songTrack.current.offsetLeft/100 + 'px';
+                  blueLoading.current.style.width=trackWidth-count*(width-trackWidth)/100 + 'px';
+                }
+              }else{
+                if(count > 50){
+                  blackBackground.current.style.zIndex = '7';
+                  blackBackground.current.style.opacity = ((150-count)/100).toString();
+                }
+                if(count ==  100){
+                  setTimeout(() => {
+                    if(blackBackground.current){
+                      blackBackground.current.style.zIndex = '9';
+                      blackBackground.current.classList.add(styles.faded);
+                    }else{
+                      throw new Error('loading elements have been been modified or destroyed');
+                    }
+                  },1000);
+                  blueLoading.current.style.borderRadius='0px';
+                  blueLoading.current.classList.add(styles.faded);
+                }
+                if(count == 150){
+                  clearInterval(fadeBack);
+                }
               }
+              count++;
             }else{
-              throw new Error('black background element has been modified or destroyed');
+                throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
             }
           }, 10);
-          blackBackground.current.classList.add(styles.faded);
-
-          blueLoading.current.classList.add(styles.faded);
         }
-        console.log(document.getElementsByClassName(styles.container));
-      }, 1000)
+      }, 500);
     }else{
       throw new Error('loading elements have been been modified or destroyed');
     }
@@ -326,8 +361,8 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
       <div ref={blackBackground} className={loading?styles.blackBackground:`${styles.blackBackground} ${styles.faded}`}>
-        <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
         {/* <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} `}> </div> */}
 
       </div>
@@ -393,7 +428,7 @@ export default function Home() {
             </div>
           </div>
         }
-        <div className={loading ? styles.loading : `${styles.loading} ${styles.faded}`}>
+        <div ref={loadiingText} className={`${styles.loading} ${styles.faded}`}>
           <p>Finding the groove...</p>
         </div>
         <div className={styles.form}>
@@ -476,7 +511,9 @@ export default function Home() {
           <div className={styles.tracks}>
             {
               tracks.map((track, i) =>
-                <Track session={session} {...track} key={i} />
+                <div ref={i==0?songTrack:null} key={i}>
+                  <Track session={session} {...track} key={i} />
+                </div>
               )
             }
           </div>
