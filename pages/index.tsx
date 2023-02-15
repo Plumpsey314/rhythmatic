@@ -305,51 +305,49 @@ export default function Home() {
       blueLoading.current.style.width = '100%';
       blueLoading.current.style.border = '5px solid #00f'
       blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
-      setTimeout(() => {
         if(blueLoading.current && blackBackground.current){
-          let count = -100;
+          let count = -50;
           blueLoading.current.style.borderRadius='8px';
           const fadeBack = setInterval(() => {
-            if(blueLoading.current&&blackBackground.current&&songTrack.current){
-              if(count <= 0){
-                if(songTrack.current){
-                  songTrack.current.style.zIndex = '10';
-                  const height = document.body.offsetHeight;
-                  const width = document.body.offsetWidth;
-                  const trackHeight = songTrack.current.offsetHeight;
-                  const trackWidth = songTrack.current.offsetWidth;
-                  blueLoading.current.style.top=(100+count)*songTrack.current.offsetTop/100 + 'px';
-                  blueLoading.current.style.height=trackHeight-count*(height-trackHeight)/100 + 'px';
-                  blueLoading.current.style.left=(100+count)*songTrack.current.offsetLeft/100 + 'px';
-                  blueLoading.current.style.width=trackWidth-count*(width-trackWidth)/100 + 'px';
-                }
-                if(count == 0){
-                  blackBackground.current.style.zIndex = '7';
-                }
-              }else{
-                if(count > 25){
-                  blackBackground.current.style.opacity = ((150-count)/100).toString();
-                }
-                if(count ==  50){
-                  blueLoading.current.style.borderRadius='0px';
-                  blueLoading.current.classList.add(styles.faded);
-                }
-                if(count == 150){
-                  if(textForm.current){
-                    textForm.current.style.pointerEvents = 'all';
-                  }
-                  blackBackground.current.style.zIndex = '9';
-                  blackBackground.current.classList.add(styles.faded);
-                  clearInterval(fadeBack);
-                }
+          if(blueLoading.current&&blackBackground.current&&songTrack.current){
+            if(count <= 0){
+              if(songTrack.current){
+                songTrack.current.style.zIndex = '10';
+                const height = document.body.offsetHeight;
+                const width = document.body.offsetWidth;
+                const trackHeight = songTrack.current.offsetHeight;
+                const trackWidth = songTrack.current.offsetWidth;
+                blueLoading.current.style.top=(50+count)*songTrack.current.offsetTop/50 + 'px';
+                blueLoading.current.style.height=trackHeight-count*(height-trackHeight)/50 + 'px';
+                blueLoading.current.style.left=(50+count)*songTrack.current.offsetLeft/50 + 'px';
+                blueLoading.current.style.width=trackWidth-count*(width-trackWidth)/50 + 'px';
               }
-              count++;
+              if(count == 0){
+                blackBackground.current.style.zIndex = '7';
+              }
             }else{
-                //throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
+              if(count > 25){
+                blackBackground.current.style.opacity = ((150-count)/100).toString();
+              }
+              if(count ==  50){
+                blueLoading.current.style.borderRadius='0px';
+                blueLoading.current.classList.add(styles.faded);
+              }
+              if(count == 150){
+                if(textForm.current){
+                  textForm.current.style.pointerEvents = 'all';
+                }
+                blackBackground.current.style.zIndex = '9';
+                blackBackground.current.classList.add(styles.faded);
+                clearInterval(fadeBack);
+              }
             }
-          }, 5);
-        }
-      }, 500);
+            count++;
+          }else{
+              //throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
+          }
+        }, 2);
+      }
     }else{
       throw new Error('loading elements have been been modified or destroyed');
     }
