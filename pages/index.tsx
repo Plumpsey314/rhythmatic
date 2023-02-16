@@ -476,6 +476,7 @@ export default function Home() {
                   }}
                 >
                   <Image
+                    className={styles.yellowIcon}
                     src="/icons/reprompt.svg"
                     width="36"
                     height="36"
