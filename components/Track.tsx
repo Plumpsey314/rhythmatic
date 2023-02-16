@@ -48,9 +48,9 @@ export default function Track(props: Props) {
       setPlaying(false);
       audioRef.current?.pause();
     } else {
+      if (currAudio) currAudio.pause();
       setPlaying(true);
       audioRef.current?.play();
-      if (currAudio) currAudio.pause();
       if (audioRef.current) setCurrAudio(audioRef.current);
     }
   }
