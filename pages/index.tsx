@@ -24,6 +24,7 @@ export default function Home() {
   const blackBackground = useRef<HTMLDivElement>(null);
   const textForm = useRef<HTMLInputElement>(null);
   const songTrack = useRef<HTMLDivElement>(null);
+  const refinePopup = useRef<HTMLDivElement>(null);
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -74,6 +75,9 @@ export default function Home() {
 
   // handle popup on start
   useEffect(() => {
+    if(localStorage.getItem('haveBeen')!='true'){
+      localStorage.setItem('haveBeen', 'false');
+    }
     const localEmail = localStorage.getItem('email');
     setPopupOpen(!localEmail);
   }, []);
@@ -175,6 +179,9 @@ export default function Home() {
   }
 
   async function loadBox(){
+    if(refinePopup.current){
+      refinePopup.current.classList.add(styles.faded);
+    }
     if(blueLoading.current){
       blueLoading.current.focus();
       if(textForm.current){
@@ -339,6 +346,9 @@ export default function Home() {
                 }
                 blackBackground.current.style.zIndex = '9';
                 blackBackground.current.classList.add(styles.faded);
+                if(localStorage.getItem('haveBeen')=='false'&&refinePopup.current){
+                  refinePopup.current.classList.remove(styles.faded);
+                }
                 clearInterval(fadeBack);
               }
             }
@@ -350,6 +360,15 @@ export default function Home() {
       }
     }else{
       throw new Error('loading elements have been been modified or destroyed');
+    }
+  }
+
+  async function closeRefreshPopup(){
+    if(refinePopup.current){
+      refinePopup.current.classList.add(styles.faded);
+      localStorage.setItem('haveBeen', 'true');
+    }else{
+      throw new Error('can not close popup if it does not exist.');
     }
   }
 
@@ -464,6 +483,10 @@ export default function Home() {
               spellCheck="false"
               required
             />
+            <div ref={refinePopup} className={`${styles.refinePopup} ${styles.faded}`}>
+              <div onClick={() => {closeRefreshPopup()}} className={styles.refinePopupX}> &times; </div>
+              Click the refresh button to refine the results!
+            </div>
             {
               tracks &&
               <Tooltip title="Refine songs" arrow>
@@ -475,13 +498,13 @@ export default function Home() {
                     loadBox();
                   }}
                 >
-                  <Image
-                    className={styles.yellowIcon}
-                    src="/icons/reprompt.svg"
-                    width="36"
-                    height="36"
-                    alt="reprompt.svg"
-                  />
+                    <Image
+                      className={styles.yellowIcon}
+                      src="/icons/reprompt.svg"
+                      width="36"
+                      height="36"
+                      alt="reprompt.svg"
+                    />
                 </button>
               </Tooltip>
             }
