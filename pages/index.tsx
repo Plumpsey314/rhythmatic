@@ -341,10 +341,13 @@ export default function Home() {
                 blackBackground.current.style.opacity = ((150 - count) / 100).toString();
               }
               if (count == 50) {
+                setTextPlaceholder('');
+                console.log("ASDFASDFASDFFASsdfafdsFADSASDFASDFDSAFAFSDDSFADSF");
                 blueLoading.current.style.borderRadius = '0px';
                 blueLoading.current.classList.add(styles.faded);
               }
               if (count == 150) {
+                setText('');
                 if (textForm.current) {
                   textForm.current.style.pointerEvents = 'all';
                 }
