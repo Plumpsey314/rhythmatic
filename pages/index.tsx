@@ -25,6 +25,8 @@ export default function Home() {
   const textForm = useRef<HTMLInputElement>(null);
   const songTrack = useRef<HTMLDivElement>(null);
 
+  const [currAudio, setCurrAudio] = useState<HTMLAudioElement>();
+
   // set up text placeholder typing effect
   useEffect(() => {
     const promptStates = [
@@ -506,7 +508,12 @@ export default function Home() {
             {
               tracks.map((track, i) =>
                 <div ref={i == 0 ? songTrack : null} key={i}>
-                  <Track session={session} {...track} key={i} />
+                  <Track
+                    currAudio={currAudio}
+                    setCurrAudio={setCurrAudio}
+                    session={session}
+                    track={track}
+                  />
                 </div>
               )
             }
