@@ -3,7 +3,7 @@ import styles from '@/styles/pages/Index.module.scss';
 import { getPrompt, getReprompt } from '@/util/prompt';
 import { Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
@@ -28,6 +28,7 @@ export default function Home() {
   const refinePopup = useRef<HTMLDivElement>(null);
 
   const [currAudio, setCurrAudio] = useState<HTMLAudioElement>();
+  const [refineTooltip, setRefineTooltip] = useState(false);
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -67,7 +68,6 @@ export default function Home() {
       }
       if (stateIndex === states.length) stateIndex = 0;
       if (countdown === 0) {
-        if (letterIndex > 36) countdown = 1;
         const minIndex = Math.max(0, letterIndex - 36);
         setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
         letterIndex++;
@@ -78,7 +78,8 @@ export default function Home() {
 
   // handle popup on start
   useEffect(() => {
-    setHaveBeen(localStorage.getItem('haveBeen')=='true'?true:false);
+    setHaveBeen(localStorage.getItem('haveBeen') == 'true' ? true : false);
+    if (!localStorage.getItem('haveBeen')) setRefineTooltip(true);
     const localEmail = localStorage.getItem('email');
     setPopupOpen(!localEmail);
   }, []);
@@ -349,7 +350,7 @@ export default function Home() {
                 }
                 blackBackground.current.style.zIndex = '9';
                 blackBackground.current.classList.add(styles.faded);
-                if(localStorage.getItem('haveBeen')=='false'&&refinePopup.current){
+                if (localStorage.getItem('haveBeen') == 'false' && refinePopup.current) {
                   refinePopup.current.classList.remove(styles.faded);
                 }
                 clearInterval(fadeBack);
@@ -366,11 +367,11 @@ export default function Home() {
     }
   }
 
-  async function closeRefreshPopup(){
-    if(refinePopup.current){
+  async function closeRefreshPopup() {
+    if (refinePopup.current) {
       refinePopup.current.classList.add(styles.faded);
       localStorage.setItem('haveBeen', 'true');
-    }else{
+    } else {
       throw new Error('can not close popup if it does not exist.');
     }
   }
@@ -396,7 +397,7 @@ export default function Home() {
         />
         <h1>Rhythmatic</h1>
       </div>
-      {
+      {/*
         !session ?
           <button className={styles.signInButton} onClick={() => signIn('spotify')}>
             Sign in with
@@ -416,7 +417,7 @@ export default function Home() {
             />
             Sign Out
           </button>
-      }
+  */}
       <div className={styles.content}>
         {
           popupOpen &&
@@ -488,18 +489,22 @@ export default function Home() {
               required
             />
             <div ref={refinePopup} className={`${styles.refinePopup} ${styles.faded}`}>
-              <div onClick={() => {closeRefreshPopup()}} className={styles.refinePopupX}> &times; </div>
+              <div onClick={() => { closeRefreshPopup() }} className={styles.refinePopupX}> &times; </div>
               Click the refresh button to refine the results!
             </div>
             {
               tracks &&
-              <Tooltip title="Click to refine the results!" arrow componentsProps={{
-                tooltip: {
-                  sx: {
-                    fontSize: "16px"
+              <Tooltip
+                open={refineTooltip}
+                onOpen={() => setRefineTooltip(true)}
+                onClose={() => setRefineTooltip(false)}
+                title="Click to refine the results!" arrow componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "16px"
+                    }
                   }
-                }
-              }}>
+                }}>
                 <button className={loading ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon}
                   type="button"
                   style={{ right: '50px' }}
@@ -509,9 +514,9 @@ export default function Home() {
                   }}
                 >
                   <Image
-                    src={haveBeen?"/icons/reprompt.svg":"/icons/repromptYellow.svg"}
-                    width={haveBeen?"36":"48"}
-                    height={haveBeen?"36":"48"}
+                    src={haveBeen ? "/icons/reprompt.svg" : "/icons/repromptYellow.svg"}
+                    width={haveBeen ? "36" : "48"}
+                    height={haveBeen ? "36" : "48"}
                     alt="reprompt.svg"
                   />
                 </button>
