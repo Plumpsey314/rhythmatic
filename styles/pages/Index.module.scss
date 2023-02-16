@@ -337,6 +337,21 @@
     }
   }
 
+  .largeTooltip{
+    font-size: 76px;
+  }
+
+  .yellowIcon {
+    width: 48px;
+    height: 48px;
+    display: visible;
+  }
+
+  .whiteIcon {
+    display: none;
+    color: white;
+  }
+
   .popupContainer {
     position: absolute;
     top: 0;

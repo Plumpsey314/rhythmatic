@@ -19,6 +19,7 @@ export default function Home() {
   const [lastResponse, setLastResponse] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [haveBeen, setHaveBeen] = useState<boolean>(false);
 
   const blueLoading = useRef<HTMLDivElement>(null);
   const blackBackground = useRef<HTMLDivElement>(null);
@@ -76,6 +77,7 @@ export default function Home() {
 
   // handle popup on start
   useEffect(() => {
+    setHaveBeen(localStorage.getItem('haveBeen')=='true'?true:false);
     const localEmail = localStorage.getItem('email');
     setPopupOpen(!localEmail);
   }, []);
@@ -305,6 +307,7 @@ export default function Home() {
 
   async function finishLoad() {
     if (blueLoading.current && blackBackground.current) {
+      localStorage.setItem('haveBeen', 'true');
       blackBackground.current.classList.remove(styles.faded);
       blueLoading.current.classList.remove(styles.faded);
       blueLoading.current.style.height = '100%';
@@ -473,7 +476,13 @@ export default function Home() {
             />
             {
               tracks &&
-              <Tooltip title="Refine songs" arrow>
+              <Tooltip title="Click to refine the results!" arrow componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "16px"
+                  }
+                }
+              }}>
                 <button className={loading ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon}
                   type="button"
                   style={{ right: '50px' }}
@@ -483,9 +492,9 @@ export default function Home() {
                   }}
                 >
                   <Image
-                    src="/icons/reprompt.svg"
-                    width="36"
-                    height="36"
+                    src={haveBeen?"/icons/reprompt.svg":"/icons/repromptYellow.svg"}
+                    width={haveBeen?"36":"48"}
+                    height={haveBeen?"36":"48"}
                     alt="reprompt.svg"
                   />
                 </button>
