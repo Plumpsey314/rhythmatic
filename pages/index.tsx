@@ -1,7 +1,7 @@
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
 import { getPrompt, getReprompt } from '@/util/prompt';
-import { LinearProgress, Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
@@ -25,6 +25,8 @@ export default function Home() {
   const textForm = useRef<HTMLInputElement>(null);
   const songTrack = useRef<HTMLDivElement>(null);
   const refinePopup = useRef<HTMLDivElement>(null);
+
+  const [currAudio, setCurrAudio] = useState<HTMLAudioElement>();
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -148,11 +150,15 @@ export default function Home() {
     });
 
     // parse json data
-    const data = await response.json();
     if (response.status !== 200) {
       setLoading(false);
-      throw data.error || new Error(`Request failed with status ${response.status}`);
+      if (response.status === 504) {
+        window.alert('Error: OpenAI did not return a response in time');
+        throw 'OpenAI request timed out';
+      }
+      else throw new Error(`Request failed with status ${response.status}`);
     }
+    const data = await response.json();
 
     // parse raw result
     let raw = data.result.trim();
@@ -178,13 +184,10 @@ export default function Home() {
     getTracks(songArray);
   }
 
-  async function loadBox(){
-    if(refinePopup.current){
-      refinePopup.current.classList.add(styles.faded);
-    }
-    if(blueLoading.current){
+  async function loadBox() {
+    if (blueLoading.current) {
       blueLoading.current.focus();
-      if(textForm.current){
+      if (textForm.current) {
         textForm.current.blur();
         textForm.current.style.pointerEvents = 'none';
       }
@@ -194,91 +197,91 @@ export default function Home() {
       let boxShadowTop = 0;
       blueLoading.current.style.left = '0px';
       blueLoading.current.style.top = '0px'
-      blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
+      blueLoading.current.style.height = document.body.offsetHeight / 2 + 'px';
       blueLoading.current.style.width = '10px';
-      blueLoading.current.style.border='none';
-      if(blackBackground.current){
+      blueLoading.current.style.border = 'none';
+      if (blackBackground.current) {
         blackBackground.current.style.opacity = '1';
-      }else{
+      } else {
         throw new Error('black background element has been modified or destroyed');
       }
       const blueLoadInterval = setInterval(() => {
-        if(blueLoading.current){
-          const boxHeightStr =  blueLoading.current.style.height;
-          let boxHeight = +(boxHeightStr.substring(0,boxHeightStr.length-2));
-          const boxWidthStr =  blueLoading.current.style.width;
-          let boxWidth = +(boxWidthStr.substring(0,boxWidthStr.length-2));
+        if (blueLoading.current) {
+          const boxHeightStr = blueLoading.current.style.height;
+          let boxHeight = +(boxHeightStr.substring(0, boxHeightStr.length - 2));
+          const boxWidthStr = blueLoading.current.style.width;
+          let boxWidth = +(boxWidthStr.substring(0, boxWidthStr.length - 2));
           const height = document.body.offsetHeight;
           const width = document.body.offsetWidth;
-          if(left==0){
-            if(top<=0){
+          if (left == 0) {
+            if (top <= 0) {
               boxShadowLeft = 3;
               boxShadowTop = 3;
-              blueLoading.current.style.borderLeft='5px solid #5024FF';
-              if(boxWidth-width/100 > 10){
-                boxHeight += height/100;
-                boxWidth -= width/100;
-              }else{
+              blueLoading.current.style.borderLeft = '5px solid #5024FF';
+              if (boxWidth - width / 100 > 10) {
+                boxHeight += height / 100;
+                boxWidth -= width / 100;
+              } else {
                 top = 0.01;
                 boxShadowLeft = 3;
                 boxShadowTop = 0;
-                blueLoading.current.style.borderTop='none';
+                blueLoading.current.style.borderTop = 'none';
               }
-            }else{
-              if(top+0.01 >= 1-boxHeight/height){
+            } else {
+              if (top + 0.01 >= 1 - boxHeight / height) {
                 boxShadowLeft = 3;
                 boxShadowTop = -3;
-                blueLoading.current.style.borderBottom='5px solid #5024FF';
-                if(boxHeight-height/100 > 10){
-                  boxHeight -= height/100;
-                  boxWidth += width/100;
-                  top=1-boxHeight/height;
-                }else{
+                blueLoading.current.style.borderBottom = '5px solid #5024FF';
+                if (boxHeight - height / 100 > 10) {
+                  boxHeight -= height / 100;
+                  boxWidth += width / 100;
+                  top = 1 - boxHeight / height;
+                } else {
                   boxShadowLeft = 0;
                   boxShadowTop = -3;
-                  blueLoading.current.style.borderLeft='none';
+                  blueLoading.current.style.borderLeft = 'none';
                   left = 0.01;
                 }
-              }else{
+              } else {
                 top += 0.01;
               }
             }
-          }else{
-            if(top <= 0.001){
-              top=0;
+          } else {
+            if (top <= 0.001) {
+              top = 0;
               boxShadowLeft = -3;
               boxShadowTop = 3;
               blueLoading.current.style.borderTop = '5px solid #5024FF';
-              if(boxHeight-height/100 > 10){
-                boxHeight -= height/100;
-                boxWidth += width/100;
-                left=1-boxWidth/width;
-              }else{
+              if (boxHeight - height / 100 > 10) {
+                boxHeight -= height / 100;
+                boxWidth += width / 100;
+                left = 1 - boxWidth / width;
+              } else {
                 boxShadowLeft = 0;
                 boxShadowTop = 3;
-                blueLoading.current.style.borderRight='none';
+                blueLoading.current.style.borderRight = 'none';
                 left -= 0.01;
-                if(left <= 0){
+                if (left <= 0) {
                   left = 0;
                 }
               }
-            }else{
-              if(left+0.01 >= 1-boxWidth/width){
+            } else {
+              if (left + 0.01 >= 1 - boxWidth / width) {
                 boxShadowLeft = -3;
                 boxShadowTop = -3;
                 blueLoading.current.style.borderRight = '5px solid #5024FF';
-                if(boxWidth-width/100 > 10){
-                  boxHeight += height/100;
-                  boxWidth -= width/100;
-                  top=1-boxHeight/height;
-                  left=1-boxWidth/width;
-                }else{
+                if (boxWidth - width / 100 > 10) {
+                  boxHeight += height / 100;
+                  boxWidth -= width / 100;
+                  top = 1 - boxHeight / height;
+                  left = 1 - boxWidth / width;
+                } else {
                   boxShadowLeft = -3;
                   boxShadowTop = 0;
-                  blueLoading.current.style.borderBottom='none';
+                  blueLoading.current.style.borderBottom = 'none';
                   top -= 0.01;
                 }
-              }else{
+              } else {
                 left += 0.01;
               }
             }
@@ -286,62 +289,62 @@ export default function Home() {
           blueLoading.current.style.boxShadow = 'inset ' + boxShadowLeft + 'px ' + boxShadowTop + 'px 6px #2600BF';
           blueLoading.current.style.height = (boxHeight) + 'px';
           blueLoading.current.style.width = (boxWidth) + 'px';
-          blueLoading.current.style.left = (left*width) + 'px';
-          blueLoading.current.style.top = (top*height) + 'px';
-          if(blueLoading.current.classList.contains(styles.faded)){
+          blueLoading.current.style.left = (left * width) + 'px';
+          blueLoading.current.style.top = (top * height) + 'px';
+          if (blueLoading.current.classList.contains(styles.faded)) {
             blueLoading.current.style.left = '0px';
             blueLoading.current.style.top = '0px'
-            blueLoading.current.style.height = document.body.offsetHeight/2 + 'px';
+            blueLoading.current.style.height = document.body.offsetHeight / 2 + 'px';
             blueLoading.current.style.width = '10px';
-            blueLoading.current.style.border='none';
+            blueLoading.current.style.border = 'none';
             finishLoad();
             clearInterval(blueLoadInterval);
           }
-        }else{
+        } else {
           throw new Error('loading element has been been modified or destroyed');
         }
       }, 3);
-    } 
+    }
   }
 
-  async function finishLoad(){
-    if(blueLoading.current && blackBackground.current){
+  async function finishLoad() {
+    if (blueLoading.current && blackBackground.current) {
       blackBackground.current.classList.remove(styles.faded);
       blueLoading.current.classList.remove(styles.faded);
       blueLoading.current.style.height = '100%';
       blueLoading.current.style.width = '100%';
       blueLoading.current.style.border = '5px solid #00f'
       blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
-        if(blueLoading.current && blackBackground.current){
-          let count = -50;
-          blueLoading.current.style.borderRadius='8px';
-          const fadeBack = setInterval(() => {
-          if(blueLoading.current&&blackBackground.current&&songTrack.current){
-            if(count <= 0){
-              if(songTrack.current){
+      if (blueLoading.current && blackBackground.current) {
+        let count = -50;
+        blueLoading.current.style.borderRadius = '8px';
+        const fadeBack = setInterval(() => {
+          if (blueLoading.current && blackBackground.current && songTrack.current) {
+            if (count <= 0) {
+              if (songTrack.current) {
                 songTrack.current.style.zIndex = '10';
                 const height = document.body.offsetHeight;
                 const width = document.body.offsetWidth;
                 const trackHeight = songTrack.current.offsetHeight;
                 const trackWidth = songTrack.current.offsetWidth;
-                blueLoading.current.style.top=(50+count)*songTrack.current.offsetTop/50 + 'px';
-                blueLoading.current.style.height=trackHeight-count*(height-trackHeight)/50 + 'px';
-                blueLoading.current.style.left=(50+count)*songTrack.current.offsetLeft/50 + 'px';
-                blueLoading.current.style.width=trackWidth-count*(width-trackWidth)/50 + 'px';
+                blueLoading.current.style.top = (50 + count) * songTrack.current.offsetTop / 50 + 'px';
+                blueLoading.current.style.height = trackHeight - count * (height - trackHeight) / 50 + 'px';
+                blueLoading.current.style.left = (50 + count) * songTrack.current.offsetLeft / 50 + 'px';
+                blueLoading.current.style.width = trackWidth - count * (width - trackWidth) / 50 + 'px';
               }
-              if(count == 0){
+              if (count == 0) {
                 blackBackground.current.style.zIndex = '7';
               }
-            }else{
-              if(count > 25){
-                blackBackground.current.style.opacity = ((150-count)/100).toString();
+            } else {
+              if (count > 25) {
+                blackBackground.current.style.opacity = ((150 - count) / 100).toString();
               }
-              if(count ==  50){
-                blueLoading.current.style.borderRadius='0px';
+              if (count == 50) {
+                blueLoading.current.style.borderRadius = '0px';
                 blueLoading.current.classList.add(styles.faded);
               }
-              if(count == 150){
-                if(textForm.current){
+              if (count == 150) {
+                if (textForm.current) {
                   textForm.current.style.pointerEvents = 'all';
                 }
                 blackBackground.current.style.zIndex = '9';
@@ -353,12 +356,12 @@ export default function Home() {
               }
             }
             count++;
-          }else{
-              //throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
+          } else {
+            //throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
           }
         }, 2);
       }
-    }else{
+    } else {
       throw new Error('loading elements have been been modified or destroyed');
     }
   }
@@ -374,8 +377,8 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <div ref={blueLoading} className={loading?styles.blueOutline:`${styles.blueOutline} ${styles.faded}`}> </div>
-      <div ref={blackBackground} className={loading?styles.blackBackground:`${styles.blackBackground} ${styles.faded}`}>
+      <div ref={blueLoading} className={loading ? styles.blueOutline : `${styles.blueOutline} ${styles.faded}`}> </div>
+      <div ref={blackBackground} className={loading ? styles.blackBackground : `${styles.blackBackground} ${styles.faded}`}>
       </div>
       <Image
         className={styles.rings}
@@ -468,7 +471,7 @@ export default function Home() {
               of Spotify and ChatGPT to supercharge your music recommendations. Try it out below!
             </p>
           </div>
-          <form  className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
+          <form className={(loading || tracks) ? styles.raised : undefined} onSubmit={e => {
             e.preventDefault();
             setPopupOpen(false);
             generateSongs(false);
@@ -490,7 +493,7 @@ export default function Home() {
             {
               tracks &&
               <Tooltip title="Refine songs" arrow>
-                <button className={loading?`${styles.submitIcon} ${styles.faded}`:styles.submitIcon}
+                <button className={loading ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon}
                   type="button"
                   style={{ right: '50px' }}
                   onClick={() => {
@@ -509,7 +512,7 @@ export default function Home() {
               </Tooltip>
             }
             <Tooltip title="Generate songs" arrow>
-              <button className={loading?`${styles.submitIcon} ${styles.faded}`:styles.submitIcon} name="bolt">
+              <button className={loading ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon} name="bolt">
                 <Image
                   src="/icons/bolt.svg"
                   width="36"
@@ -525,8 +528,13 @@ export default function Home() {
           <div className={styles.tracks}>
             {
               tracks.map((track, i) =>
-                <div ref={i==0?songTrack:null} key={i}>
-                  <Track session={session} {...track} key={i} />
+                <div ref={i == 0 ? songTrack : null} key={i}>
+                  <Track
+                    currAudio={currAudio}
+                    setCurrAudio={setCurrAudio}
+                    session={session}
+                    track={track}
+                  />
                 </div>
               )
             }
