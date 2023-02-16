@@ -144,11 +144,15 @@ export default function Home() {
     });
 
     // parse json data
-    const data = await response.json();
     if (response.status !== 200) {
       setLoading(false);
-      throw data.error || new Error(`Request failed with status ${response.status}`);
+      if (response.status === 504) {
+        window.alert('Error: OpenAI did not return a response in time');
+        throw 'OpenAI request timed out';
+      }
+      else throw new Error(`Request failed with status ${response.status}`);
     }
+    const data = await response.json();
 
     // parse raw result
     let raw = data.result.trim();
