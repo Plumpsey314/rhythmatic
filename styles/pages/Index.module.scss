@@ -4,31 +4,34 @@
   background: radial-gradient(62.36% 124.36% at 88.66% 0%, rgba(0, 102, 255, 0.33) 0%, rgba(0, 0, 0, 0.33) 100%), radial-gradient(45.3% 135.72% at 5.78% 8.67%, rgba(36, 0, 255, 0.66) 0%, rgba(0, 0, 0, 0.66) 100%), radial-gradient(59.56% 59.56% at 43.3% 89%, #9E00FF 0%, #000000 100%);
   position: relative;
 
-  .narrow_screen{
-    display: none;
-  }
+  .blackBackground{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: black;
+    z-index: 9;
 
-  @media (max-width: 750px) {
-    overflow: scroll;
-
-    .narrow_screen{
-      display: contents;
-    }
-
-    .wide_screen{
-      display: none;
-    }
-
-    .logo_container{
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .form_contents{
-      margin-top: 100px;
+    &.faded {
+      opacity: 0;
+      pointer-events: none;
     }
   }
-
+  .blueOutline{
+    position: absolute;
+    z-index: 99;
+    max-height: 100%;
+    max-width: 100%;
+    height: 500px;
+    width: 10px;
+    border-top: 5px solid #00f;
+    border-bottom: none;
+    border-left: 5px solid #00f;
+    border-right: none;
+    &.faded {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
 
   .rings {
     position: absolute;
@@ -41,7 +44,7 @@
 
   .logo {
     position: absolute;
-    width: 210px;
+    padding: 0 16px;
     height: 56px;
     left: 24px;
     top: 24px;
@@ -52,11 +55,25 @@
     align-items: center;
     justify-content: center;
     z-index: 5;
+
+    @media (max-width: 513.98px) {
+      display: none;
+    }
+
+    >img {
+      margin-right: 4px;
+    }
+
+    >h1 {
+      color: #fff;
+      font-weight: 500;
+      margin: 0;
+    }
   }
 
   .signInButton {
     position: absolute;
-    width: 195px;
+    padding: 0 16px;
     height: 56px;
     top: 24px;
     right: 24px;
@@ -108,7 +125,6 @@
 
   .content {
     height: 100%;
-    padding: 40px;
     overflow: auto;
 
     >.loading {
@@ -121,6 +137,7 @@
       color: #fff;
       opacity: 1;
       transition: 1s;
+      z-index: 10;
 
       &.faded {
         opacity: 0;
@@ -132,39 +149,44 @@
       }
     }
 
-    >.reset {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 16px;
-
-      >button {
-        padding: 0 40px;
-        height: 56px;
-        font-size: 24px;
-        background: var(--spotify-green);
-        border: 0;
-        color: #fff;
-        border-radius: 32px;
-
-        &:hover {
-          background: var(--spotify-green-alt);
-        }
-      }
-    }
-
     >.form {
       text-align: center;
       display: flex;
       align-items: center;
       flex-direction: column;
       color: #fff;
-      max-width: 660px;
-      margin: 0 auto;
-      margin-top: 120px;
+
+      .smallHidden {
+        @media (max-width: 767.98px) {
+          display: none;
+        }
+      }
+
+      .smallShown {
+        @media (min-width: 768px) {
+          display: none;
+        }
+      }
+
+      .tinyHidden {
+        @media (max-width: 499.98px) {
+          display: none;
+        }
+      }
+
+      .tinyShown {
+        @media (min-width: 500px) {
+          display: none;
+        }
+      }
 
       >.formTitle {
         opacity: 1;
         transition: 0.5s;
+        position: absolute;
+        max-width: 660px;
+        top: 160px;
+        margin: 0 40px;
 
         &.faded {
           opacity: 0;
@@ -173,8 +195,34 @@
 
         >div {
           display: flex;
-          align-items: flex-end;
-          margin-bottom: 12px;
+          align-items: center;
+          justify-content: center;
+          max-width: 100vw;
+
+          @media (max-width: 767.98px) {
+            flex-direction: column;
+            align-items: center;
+          }
+
+          >.titleLogo {
+            display: flex;
+            align-items: center;
+
+            >img {
+              margin-right: 6px;
+            }
+
+            >h1 {
+              margin: 0;
+              font-weight: 500;
+              font-size: 56px;
+              margin-right: 12px;
+
+              @media (max-width: 470.98px) {
+                font-size: 42px;
+              }
+            }
+          }
 
           >p {
             font-size: 32px;
@@ -186,24 +234,50 @@
 
         >p {
           font-size: 32px;
-          margin: 0;
-          line-height: 48px;
+          margin: 0 8px;
+          line-height: 52px;
+
+          @media (max-width: 513.98px) {
+            font-size: 24px;
+            line-height: 44px;
+          }
         }
       }
 
       >form {
-        margin-top: 40px;
         display: flex;
         position: absolute;
-        top: 320px;
+        top: 360px;
         transition: 1s;
 
+        @media (max-width: 767.98px) {
+          top: 400px;
+        }
+
+        @media (max-width: 595.98px) {
+          top: 440px;
+        }
+
+        @media (max-width: 513.98px) {
+          top: 400px;
+        }
+
+        @media (max-width: 470.98px) {
+          top: 440px;
+        }
+
         &.raised {
-          top: -16px;
+          top: 24px;
+          z-index: 10;
+
+          @media (max-width: 1199.98px) {
+            top: 104px;
+          }
         }
 
         >input {
           width: 600px;
+          max-width: calc(100vw - 48px);
           height: 56px;
           background: #111;
           border: 1px solid #444;
@@ -212,8 +286,7 @@
           font-size: 27px;
           color: #ccc;
           z-index: 2;
-          padding: 12px 52px 12px 12px;
-          text-overflow: ellipsis;
+          padding: 12px 100px 12px 12px;
 
           &:active {
             outline: 2px solid #5024ff;
@@ -226,8 +299,8 @@
 
         >button {
           position: absolute;
-          right: 0;
-          width: 56px;
+          right: 8px;
+          width: 42px;
           height: 56px;
           display: flex;
           align-items: center;
@@ -248,16 +321,92 @@
       align-items: center;
       overflow: auto;
       display: flex;
-      margin: 0 auto;
-      margin-top: -200px;
+      margin: 120px 0 40px 0;
+      overflow: hidden;
+
+      @media (max-width: 1199.98px) {
+        margin-top: 180px;
+      }
     }
   }
 
-  .copyright {
-    position: fixed;
-    right: 50px;
-    bottom: 50px;
-    margin: 0;
-    color: white
+  .submitIcon{
+    &.faded{
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  .popupContainer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+
+    >.popup {
+      background: #fff;
+      width: 400px;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      box-shadow: 0 0 8px #fff;
+      z-index: 10;
+
+      >button {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 24px;
+
+        background: rgba(255, 0, 0, 0.3);
+
+        &:hover {
+          background: rgba(255, 0, 0, 0.4);
+        }
+      }
+
+      >p {
+        margin: 0 0 8px 0;
+        font-style: italic;
+      }
+
+      >form {
+        >input {
+          border: 2px solid #000;
+          border-right: 0;
+          height: 36px;
+          padding: 0 8px;
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+        }
+
+        >button {
+          border: 2px solid #000;
+          border-left: 0;
+          height: 36px;
+          padding: 0 8px;
+          border-top-right-radius: 8px;
+          border-bottom-right-radius: 8px;
+          background: #2196f3;
+          color: #fff;
+
+          &:hover {
+            background: #0c88ed;
+          }
+        }
+      }
+    }
   }
 }

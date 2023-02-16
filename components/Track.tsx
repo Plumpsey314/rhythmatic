@@ -2,28 +2,38 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import { createTheme, ThemeProvider, Tooltip } from '@mui/material';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { Dispatch, useEffect, useRef, useState } from 'react';
 import styles from '../styles/components/Track.module.scss';
 
-export default function Track(props: any) {
-  const {
-    name, id, artists, album, external_urls,
-    preview_url, session
-  } = props;
+type Props = {
+  currAudio?: HTMLAudioElement;
+  setCurrAudio: Dispatch<HTMLAudioElement>;
+  session: any;
+  track: any;
+};
+
+export default function Track(props: Props) {
+  const { currAudio, setCurrAudio, session, track } = props;
+  const { name, id, artists, album, external_urls, preview_url } = track;
 
   const [saved, setSaved] = useState(false);
   const [playing, setPlaying] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // stop playing on pause or end
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     function stopPlaying() {
       setPlaying(false);
     }
+    audio.addEventListener('pause', stopPlaying);
     audio.addEventListener('ended', stopPlaying);
-    return () => audio.removeEventListener('ended', stopPlaying);
+    return () => {
+      audio.removeEventListener('pause', stopPlaying);
+      audio.removeEventListener('ended', stopPlaying);
+    }
   }, [audioRef])
 
   const theme = createTheme({
@@ -32,6 +42,18 @@ export default function Track(props: any) {
     }
   });
 
+  // toggles track play state
+  function togglePlay() {
+    if (playing) {
+      setPlaying(false);
+      audioRef.current?.pause();
+    } else {
+      setPlaying(true);
+      audioRef.current?.play();
+      if (currAudio) currAudio.pause();
+      if (audioRef.current) setCurrAudio(audioRef.current);
+    }
+  }
 
   // saves given track to library
   async function saveTrack(id: string) {
@@ -45,29 +67,28 @@ export default function Track(props: any) {
 
   if (!external_urls || !artists || !album) return null;
 
+  const url = external_urls['spotify'];
+
   return (
     <div className={styles.container}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={album.images[0].url} alt="" />
-      <div className={styles.details}>
-        <h1>{name}</h1>
-        <p>{artists.map((artist: any) => artist.name).join(', ')}</p>
-        <p>{album.name}</p>
-      </div>
-      <span className={styles.flexfill} />
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={album.images[0].url} alt="" />
+        <div className={styles.details}>
+          <h1>{name}</h1>
+          <p>{artists.map((artist: any) => artist.name).join(', ')}</p>
+          <p>{album.name}</p>
+        </div>
+        <span className={styles.flexfill} />
+      </a>
       <audio
         ref={audioRef}
         src={preview_url} controls hidden
       />
-      <button onClick={() => {
-        if (playing) {
-          setPlaying(false);
-          audioRef.current?.pause();
-        } else {
-          setPlaying(true);
-          audioRef.current?.play();
-        }
-      }} className={session ? styles.play : `${styles.play} ${styles.lonely}`}>
+      <button
+        onClick={togglePlay}
+        className={session ? styles.play : `${styles.play} ${styles.lonely}`}
+      >
         {
           !playing ?
             <Image
