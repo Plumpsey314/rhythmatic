@@ -1,11 +1,11 @@
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
 import { getPrompt, getReprompt } from '@/util/prompt';
-import { LinearProgress, Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
@@ -19,6 +19,16 @@ export default function Home() {
   const [lastResponse, setLastResponse] = useState('');
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [haveBeen, setHaveBeen] = useState<boolean>(false);
+
+  const blueLoading = useRef<HTMLDivElement>(null);
+  const blackBackground = useRef<HTMLDivElement>(null);
+  const textForm = useRef<HTMLInputElement>(null);
+  const songTrack = useRef<HTMLDivElement>(null);
+  const refinePopup = useRef<HTMLDivElement>(null);
+
+  const [currAudio, setCurrAudio] = useState<HTMLAudioElement>();
+  const [refineTooltip, setRefineTooltip] = useState(false);
 
   // set up text placeholder typing effect
   useEffect(() => {
@@ -33,7 +43,6 @@ export default function Home() {
       'Only popular rap music though',
       'Make them sad but still empowering',
       'Only happy music',
-      'Can you make them sad but still empowering',
       'Can you only find rap or pop music from after 2020',
       'Only electronic music though',
       'Can you make it very chill pop music?'
@@ -59,7 +68,6 @@ export default function Home() {
       }
       if (stateIndex === states.length) stateIndex = 0;
       if (countdown === 0) {
-        if (letterIndex > 36) countdown = 1;
         const minIndex = Math.max(0, letterIndex - 36);
         setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
         letterIndex++;
@@ -70,6 +78,8 @@ export default function Home() {
 
   // handle popup on start
   useEffect(() => {
+    setHaveBeen(localStorage.getItem('haveBeen') == 'true' ? true : false);
+    if (!localStorage.getItem('haveBeen')) setRefineTooltip(true);
     const localEmail = localStorage.getItem('email');
     setPopupOpen(!localEmail);
   }, []);
@@ -140,11 +150,15 @@ export default function Home() {
     });
 
     // parse json data
-    const data = await response.json();
     if (response.status !== 200) {
       setLoading(false);
-      throw data.error || new Error(`Request failed with status ${response.status}`);
+      if (response.status === 504) {
+        window.alert('Error: OpenAI did not return a response in time');
+        throw 'OpenAI request timed out';
+      }
+      else throw new Error(`Request failed with status ${response.status}`);
     }
+    const data = await response.json();
 
     // parse raw result
     let raw = data.result.trim();
@@ -170,8 +184,203 @@ export default function Home() {
     getTracks(songArray);
   }
 
+  async function loadBox() {
+    if (blueLoading.current) {
+      blueLoading.current.focus();
+      if (textForm.current) {
+        textForm.current.blur();
+        textForm.current.style.pointerEvents = 'none';
+      }
+      let top = 0;
+      let left = 0;
+      let boxShadowLeft = 3;
+      let boxShadowTop = 0;
+      blueLoading.current.style.left = '0px';
+      blueLoading.current.style.top = '0px'
+      blueLoading.current.style.height = document.body.offsetHeight / 2 + 'px';
+      blueLoading.current.style.width = '10px';
+      blueLoading.current.style.border = 'none';
+      if (blackBackground.current) {
+        blackBackground.current.style.opacity = '1';
+      } else {
+        throw new Error('black background element has been modified or destroyed');
+      }
+      const blueLoadInterval = setInterval(() => {
+        if (blueLoading.current) {
+          const boxHeightStr = blueLoading.current.style.height;
+          let boxHeight = +(boxHeightStr.substring(0, boxHeightStr.length - 2));
+          const boxWidthStr = blueLoading.current.style.width;
+          let boxWidth = +(boxWidthStr.substring(0, boxWidthStr.length - 2));
+          const height = document.body.offsetHeight;
+          const width = document.body.offsetWidth;
+          if (left == 0) {
+            if (top <= 0) {
+              boxShadowLeft = 3;
+              boxShadowTop = 3;
+              blueLoading.current.style.borderLeft = '5px solid #5024FF';
+              if (boxWidth - width / 100 > 10) {
+                boxHeight += height / 100;
+                boxWidth -= width / 100;
+              } else {
+                top = 0.01;
+                boxShadowLeft = 3;
+                boxShadowTop = 0;
+                blueLoading.current.style.borderTop = 'none';
+              }
+            } else {
+              if (top + 0.01 >= 1 - boxHeight / height) {
+                boxShadowLeft = 3;
+                boxShadowTop = -3;
+                blueLoading.current.style.borderBottom = '5px solid #5024FF';
+                if (boxHeight - height / 100 > 10) {
+                  boxHeight -= height / 100;
+                  boxWidth += width / 100;
+                  top = 1 - boxHeight / height;
+                } else {
+                  boxShadowLeft = 0;
+                  boxShadowTop = -3;
+                  blueLoading.current.style.borderLeft = 'none';
+                  left = 0.01;
+                }
+              } else {
+                top += 0.01;
+              }
+            }
+          } else {
+            if (top <= 0.001) {
+              top = 0;
+              boxShadowLeft = -3;
+              boxShadowTop = 3;
+              blueLoading.current.style.borderTop = '5px solid #5024FF';
+              if (boxHeight - height / 100 > 10) {
+                boxHeight -= height / 100;
+                boxWidth += width / 100;
+                left = 1 - boxWidth / width;
+              } else {
+                boxShadowLeft = 0;
+                boxShadowTop = 3;
+                blueLoading.current.style.borderRight = 'none';
+                left -= 0.01;
+                if (left <= 0) {
+                  left = 0;
+                }
+              }
+            } else {
+              if (left + 0.01 >= 1 - boxWidth / width) {
+                boxShadowLeft = -3;
+                boxShadowTop = -3;
+                blueLoading.current.style.borderRight = '5px solid #5024FF';
+                if (boxWidth - width / 100 > 10) {
+                  boxHeight += height / 100;
+                  boxWidth -= width / 100;
+                  top = 1 - boxHeight / height;
+                  left = 1 - boxWidth / width;
+                } else {
+                  boxShadowLeft = -3;
+                  boxShadowTop = 0;
+                  blueLoading.current.style.borderBottom = 'none';
+                  top -= 0.01;
+                }
+              } else {
+                left += 0.01;
+              }
+            }
+          }
+          blueLoading.current.style.boxShadow = 'inset ' + boxShadowLeft + 'px ' + boxShadowTop + 'px 6px #2600BF';
+          blueLoading.current.style.height = (boxHeight) + 'px';
+          blueLoading.current.style.width = (boxWidth) + 'px';
+          blueLoading.current.style.left = (left * width) + 'px';
+          blueLoading.current.style.top = (top * height) + 'px';
+          if (blueLoading.current.classList.contains(styles.faded)) {
+            blueLoading.current.style.left = '0px';
+            blueLoading.current.style.top = '0px'
+            blueLoading.current.style.height = document.body.offsetHeight / 2 + 'px';
+            blueLoading.current.style.width = '10px';
+            blueLoading.current.style.border = 'none';
+            finishLoad();
+            clearInterval(blueLoadInterval);
+          }
+        } else {
+          throw new Error('loading element has been been modified or destroyed');
+        }
+      }, 3);
+    }
+  }
+
+  async function finishLoad() {
+    if (blueLoading.current && blackBackground.current) {
+      localStorage.setItem('haveBeen', 'true');
+      blackBackground.current.classList.remove(styles.faded);
+      blueLoading.current.classList.remove(styles.faded);
+      blueLoading.current.style.height = '100%';
+      blueLoading.current.style.width = '100%';
+      blueLoading.current.style.border = '5px solid #00f'
+      blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
+      if (blueLoading.current && blackBackground.current) {
+        let count = -50;
+        blueLoading.current.style.borderRadius = '8px';
+        const fadeBack = setInterval(() => {
+          if (blueLoading.current && blackBackground.current && songTrack.current) {
+            if (count <= 0) {
+              if (songTrack.current) {
+                songTrack.current.style.zIndex = '10';
+                const height = document.body.offsetHeight;
+                const width = document.body.offsetWidth;
+                const trackHeight = songTrack.current.offsetHeight;
+                const trackWidth = songTrack.current.offsetWidth;
+                blueLoading.current.style.top = (50 + count) * songTrack.current.offsetTop / 50 + 'px';
+                blueLoading.current.style.height = trackHeight - count * (height - trackHeight) / 50 + 'px';
+                blueLoading.current.style.left = (50 + count) * songTrack.current.offsetLeft / 50 + 'px';
+                blueLoading.current.style.width = trackWidth - count * (width - trackWidth) / 50 + 'px';
+              }
+              if (count == 0) {
+                blackBackground.current.style.zIndex = '7';
+              }
+            } else {
+              if (count > 25) {
+                blackBackground.current.style.opacity = ((150 - count) / 100).toString();
+              }
+              if (count == 50) {
+                blueLoading.current.style.borderRadius = '0px';
+                blueLoading.current.classList.add(styles.faded);
+              }
+              if (count == 150) {
+                if (textForm.current) {
+                  textForm.current.style.pointerEvents = 'all';
+                }
+                blackBackground.current.style.zIndex = '9';
+                blackBackground.current.classList.add(styles.faded);
+                if (localStorage.getItem('haveBeen') == 'false' && refinePopup.current) {
+                  refinePopup.current.classList.remove(styles.faded);
+                }
+                clearInterval(fadeBack);
+              }
+            }
+            count++;
+          } else {
+            //throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
+          }
+        }, 2);
+      }
+    } else {
+      throw new Error('loading elements have been been modified or destroyed');
+    }
+  }
+
+  async function closeRefreshPopup() {
+    if (refinePopup.current) {
+      refinePopup.current.classList.add(styles.faded);
+      localStorage.setItem('haveBeen', 'true');
+    } else {
+      throw new Error('can not close popup if it does not exist.');
+    }
+  }
+
   return (
     <div className={styles.container}>
+      <div ref={blueLoading} className={loading ? styles.blueOutline : `${styles.blueOutline} ${styles.faded}`}> </div>
+      <div ref={blackBackground} className={loading ? styles.blackBackground : `${styles.blackBackground} ${styles.faded}`}>
+      </div>
       <Image
         className={styles.rings}
         src="/img/rings.svg"
@@ -188,7 +397,7 @@ export default function Home() {
         />
         <h1>Rhythmatic</h1>
       </div>
-      {
+      {/*
         !session ?
           <button className={styles.signInButton} onClick={() => signIn('spotify')}>
             Sign in with
@@ -208,7 +417,7 @@ export default function Home() {
             />
             Sign Out
           </button>
-      }
+  */}
       <div className={styles.content}>
         {
           popupOpen &&
@@ -234,17 +443,6 @@ export default function Home() {
             </div>
           </div>
         }
-        <div className={loading ? styles.loading : `${styles.loading} ${styles.faded}`}>
-          <p>Finding the groove...</p>
-          <LinearProgress sx={{
-            background: '#fff',
-            height: '6px',
-            borderRadius: '2px',
-            '& .MuiLinearProgress-bar': {
-              background: '#5024ff'
-            }
-          }} />
-        </div>
         <div className={styles.form}>
           <div
             className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
@@ -278,34 +476,54 @@ export default function Home() {
             e.preventDefault();
             setPopupOpen(false);
             generateSongs(false);
+            loadBox();
           }}>
             <input
+              ref={textForm}
               type="text"
+              className={styles.form_contents}
               placeholder={textPlaceholder}
               value={text}
               onChange={e => setText(e.target.value)}
               spellCheck="false"
               required
             />
+            <div ref={refinePopup} className={`${styles.refinePopup} ${styles.faded}`}>
+              <div onClick={() => { closeRefreshPopup() }} className={styles.refinePopupX}> &times; </div>
+              Click the refresh button to refine the results!
+            </div>
             {
               tracks &&
-              <Tooltip title="Refine songs" arrow>
-                <button
+              <Tooltip
+                open={refineTooltip}
+                onOpen={() => setRefineTooltip(true)}
+                onClose={() => setRefineTooltip(false)}
+                title="Click to refine the results!" arrow componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "16px"
+                    }
+                  }
+                }}>
+                <button className={loading ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon}
                   type="button"
                   style={{ right: '50px' }}
-                  onClick={() => generateSongs(true)}
+                  onClick={() => {
+                    generateSongs(true)
+                    loadBox();
+                  }}
                 >
                   <Image
-                    src="/icons/reprompt.svg"
-                    width="36"
-                    height="36"
+                    src={haveBeen ? "/icons/reprompt.svg" : "/icons/repromptYellow.svg"}
+                    width={haveBeen ? "36" : "48"}
+                    height={haveBeen ? "36" : "48"}
                     alt="reprompt.svg"
                   />
                 </button>
               </Tooltip>
             }
             <Tooltip title="Generate songs" arrow>
-              <button name="bolt">
+              <button className={loading ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon} name="bolt">
                 <Image
                   src="/icons/bolt.svg"
                   width="36"
@@ -321,7 +539,14 @@ export default function Home() {
           <div className={styles.tracks}>
             {
               tracks.map((track, i) =>
-                <Track session={session} {...track} key={i} />
+                <div ref={i == 0 ? songTrack : null} key={i}>
+                  <Track
+                    currAudio={currAudio}
+                    setCurrAudio={setCurrAudio}
+                    session={session}
+                    track={track}
+                  />
+                </div>
               )
             }
           </div>
