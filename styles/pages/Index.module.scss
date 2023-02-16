@@ -1,6 +1,6 @@
 .container {
   height: 100%;
-  overflow: hidden;
+  overflow: hidden !important;
   background: radial-gradient(62.36% 124.36% at 88.66% 0%, rgba(0, 102, 255, 0.33) 0%, rgba(0, 0, 0, 0.33) 100%), radial-gradient(45.3% 135.72% at 5.78% 8.67%, rgba(36, 0, 255, 0.66) 0%, rgba(0, 0, 0, 0.66) 100%), radial-gradient(59.56% 59.56% at 43.3% 89%, #9E00FF 0%, #000000 100%);
   position: relative;
 
@@ -319,7 +319,7 @@
     .tracks {
       flex-direction: column;
       align-items: center;
-      overflow: scroll;
+      overflow: auto;
       display: flex;
       margin: 120px 0 40px 0;
       overflow: hidden;
