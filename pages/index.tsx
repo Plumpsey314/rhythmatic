@@ -43,7 +43,7 @@ export default function Home() {
       'Only happy music',
       'Make them sad but still empowering',
       'rap music though',
-      'Can you only find rap or pop music from after 2020',
+      'find rap or pop music from after 2020',
       'make it more chill',
       'more romantic'
     ];
