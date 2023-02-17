@@ -40,12 +40,12 @@ export default function Home() {
       'I am playing chess and I want music that won\'t distract me but will keep me happy.'
     ];
     const repromptStates = [
-      'Only popular rap music though',
-      'Make them sad but still empowering',
       'Only happy music',
+      'Make them sad but still empowering',
+      'rap music though',
       'Can you only find rap or pop music from after 2020',
-      'Only electronic music though',
-      'Can you make it very chill pop music?'
+      'make it more chill',
+      'more romantic'
     ];
     let stateIndex = 0;
     let letterIndex = 0;
