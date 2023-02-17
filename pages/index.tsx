@@ -37,6 +37,7 @@ export default function Home() {
       'I\'m having a party and want songs that will keep everyone dancing',
       'I want to feel empowered, play me some empowering pop songs',
       'songs for running',
+      'songs like Hey Jude but not by the Beatles',
       'rap songs for a hard workout',
       'I\'m in the mood for throwback hits from the 90s and 2000s',
       'I am playing chess and I want music that won\'t distract me but will keep me happy.'
