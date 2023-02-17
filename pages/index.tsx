@@ -54,25 +54,26 @@ export default function Home() {
     let stateIndex = 0;
     let letterIndex = 0;
     let countdown = 0;
-    let startingIndex = 0;
     let states = promptStates;
+    let maxChars = 36
+    if(textForm.current){
+      maxChars = (textForm.current.offsetWidth-112) * 0.07;
+    }
     const textInterval = setInterval(() => {
       if (states == promptStates && anyTracks) {
         states = repromptStates;
         stateIndex = 0;
         letterIndex = 0;
         countdown = 0;
-        startingIndex = 0;
       }
       if (letterIndex === states[stateIndex].length) {
         letterIndex = 0;
         stateIndex++;
         countdown = 16;
-        startingIndex = 0;
       }
       if (stateIndex === states.length) stateIndex = 0;
       if (countdown === 0) {
-        const minIndex = Math.max(0, letterIndex - 36);
+        const minIndex = Math.max(0, letterIndex - maxChars);
         if(minIndex>0){
           countdown=1;
         }
@@ -234,6 +235,7 @@ export default function Home() {
       if (textForm.current) {
         textForm.current.blur();
         textForm.current.style.pointerEvents = 'none';
+        textForm.current.style.paddingRight = '100px';
       }
       let top = 0;
       let left = 0;
