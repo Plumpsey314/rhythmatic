@@ -34,15 +34,18 @@ export default function Home() {
   useEffect(() => {
     const promptStates = [
       'I am going on a long car ride through the mountains and want music that will keep me from falling asleep',
-      'I want to feel empowered, play me some empowering pop songs',
       'I\'m having a party and want songs that will keep everyone dancing',
+      'I want to feel empowered, play me some empowering pop songs',
+      'songs for running',
+      'rap songs for a hard workout',
       'I\'m in the mood for throwback hits from the 90s and 2000s',
       'I am playing chess and I want music that won\'t distract me but will keep me happy.'
     ];
     const repromptStates = [
-      'Only popular rap music though',
+      'Only popular rap music',
       'Make them sad but still empowering',
       'Only happy music',
+      'make them energizing',
       'Can you only find rap or pop music from after 2020',
       'Only electronic music though',
       'Can you make it very chill pop music?'
