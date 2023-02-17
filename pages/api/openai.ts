@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
       prompt: `${prompt}${text} -> `,
-      temperature: 0,
+      temperature: .7,
       max_tokens: 256
     });
     res.status(200).json({ result: completion.data.choices[0].text });
