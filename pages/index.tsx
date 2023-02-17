@@ -20,6 +20,7 @@ export default function Home() {
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const [haveBeen, setHaveBeen] = useState<boolean>(false);
+  const [anyTracks, setAnyTracks] = useState<boolean>(tracks?tracks.length>0?true:false:false);
 
   const blueLoading = useRef<HTMLDivElement>(null);
   const blackBackground = useRef<HTMLDivElement>(null);
@@ -53,7 +54,7 @@ export default function Home() {
     let startingIndex = 0;
     let states = promptStates;
     const textInterval = setInterval(() => {
-      if (states == promptStates && tracks) {
+      if (states == promptStates && anyTracks) {
         states = repromptStates;
         stateIndex = 0;
         letterIndex = 0;
@@ -69,12 +70,15 @@ export default function Home() {
       if (stateIndex === states.length) stateIndex = 0;
       if (countdown === 0) {
         const minIndex = Math.max(0, letterIndex - 36);
+        if(minIndex>0){
+          countdown=1;
+        }
         setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
         letterIndex++;
       } else countdown--;
     }, 80);
     return () => clearInterval(textInterval);
-  }, [tracks]);
+  }, [anyTracks]);
 
   // handle popup on start
   useEffect(() => {
@@ -83,6 +87,18 @@ export default function Home() {
     const localEmail = localStorage.getItem('email');
     setPopupOpen(!localEmail);
   }, []);
+
+  useEffect(() => {
+    if(anyTracks){
+      if(!tracks){
+        setAnyTracks(false);
+      }
+    }else{
+      if(tracks){
+        setAnyTracks(true);
+      }
+    }
+  }, [tracks])
 
   // gets data for given tracks
   async function getTracks(tracksData: string[]) {
@@ -129,8 +145,15 @@ export default function Home() {
     if (loading) return;
     setLoading(true);
 
+    if(text.length > 300){
+      handleErrorUI(); 
+      window.alert('Please enter less than 300 characters');
+      return;
+    }
+
     // return if no text
     if (!text || !text.trim()) {
+      handleErrorUI(); 
       window.alert('Please enter some text.');
       return;
     }
@@ -139,6 +162,9 @@ export default function Home() {
     setTracks(undefined);
     if (reprompting && !lastResponse) throw 'no last response';
     const prompt = reprompting ? getReprompt(lastResponse) : getPrompt();
+
+    // Loading box
+    loadBox();
 
     // make request to chatgpt
     const response = await fetch("/api/openai", {
@@ -154,9 +180,13 @@ export default function Home() {
       setLoading(false);
       if (response.status === 504) {
         window.alert('Error: OpenAI did not return a response in time');
+        handleErrorUI();
         throw 'OpenAI request timed out';
       }
-      else throw new Error(`Request failed with status ${response.status}`);
+      else{      
+        handleErrorUI(); 
+        throw new Error(`Request failed with status ${response.status}`);
+      }
     }
     const data = await response.json();
 
@@ -165,6 +195,7 @@ export default function Home() {
     const bracketIndex = raw.indexOf('[');
     if (bracketIndex === -1) {
       setLoading(false);
+      handleErrorUI();
       window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
       throw 'invalid result';
     }
@@ -177,11 +208,21 @@ export default function Home() {
       songArray = JSON.parse(raw);
     } catch (e) {
       setLoading(false);
+      handleErrorUI();
       throw `Something went wrong parsing the result: ${e}`;
     }
 
     // get tracks from song data
     getTracks(songArray);
+  }
+
+  async function handleErrorUI(){
+    setText('');
+    if(blueLoading.current&&blackBackground.current){
+      blueLoading.current.classList.add(styles.faded);
+      blackBackground.current.classList.add(styles.faded);
+    }
+    setLoading(false);
   }
 
   async function loadBox() {
@@ -203,6 +244,7 @@ export default function Home() {
       if (blackBackground.current) {
         blackBackground.current.style.opacity = '1';
       } else {
+        handleErrorUI();
         throw new Error('black background element has been modified or destroyed');
       }
       const blueLoadInterval = setInterval(() => {
@@ -301,6 +343,7 @@ export default function Home() {
             clearInterval(blueLoadInterval);
           }
         } else {
+          handleErrorUI();
           throw new Error('loading element has been been modified or destroyed');
         }
       }, 3);
@@ -316,6 +359,8 @@ export default function Home() {
       blueLoading.current.style.width = '100%';
       blueLoading.current.style.border = '5px solid #00f'
       blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
+      setAnyTracks(true);
+      setText('');
       if (blueLoading.current && blackBackground.current) {
         let count = -50;
         blueLoading.current.style.borderRadius = '8px';
@@ -341,13 +386,10 @@ export default function Home() {
                 blackBackground.current.style.opacity = ((150 - count) / 100).toString();
               }
               if (count == 50) {
-                setTextPlaceholder('');
-                console.log("ASDFASDFASDFFASsdfafdsFADSASDFASDFDSAFAFSDDSFADSF");
                 blueLoading.current.style.borderRadius = '0px';
                 blueLoading.current.classList.add(styles.faded);
               }
               if (count == 150) {
-                setText('');
                 if (textForm.current) {
                   textForm.current.style.pointerEvents = 'all';
                 }
@@ -361,11 +403,13 @@ export default function Home() {
             }
             count++;
           } else {
+            //handleErrorUI();
             //throw new Error('loading or track elements have been been modified, destroyed, or they do not exist');
           }
         }, 2);
       }
     } else {
+      handleErrorUI();
       throw new Error('loading elements have been been modified or destroyed');
     }
   }
@@ -375,6 +419,7 @@ export default function Home() {
       refinePopup.current.classList.add(styles.faded);
       localStorage.setItem('haveBeen', 'true');
     } else {
+      handleErrorUI();
       throw new Error('can not close popup if it does not exist.');
     }
   }
@@ -479,7 +524,6 @@ export default function Home() {
             e.preventDefault();
             setPopupOpen(false);
             generateSongs(false);
-            loadBox();
           }}>
             <input
               ref={textForm}
@@ -513,7 +557,6 @@ export default function Home() {
                   style={{ right: '50px' }}
                   onClick={() => {
                     generateSongs(true)
-                    loadBox();
                   }}
                 >
                   <Image
