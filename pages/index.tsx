@@ -20,7 +20,7 @@ export default function Home() {
   const [tracks, setTracks] = useState<any[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const [haveBeen, setHaveBeen] = useState<boolean>(false);
-  const [anyTracks, setAnyTracks] = useState<boolean>(tracks?tracks.length>0?true:false:false);
+  const [anyTracks, setAnyTracks] = useState<boolean>(tracks ? tracks.length > 0 ? true : false : false);
 
   const blueLoading = useRef<HTMLDivElement>(null);
   const blackBackground = useRef<HTMLDivElement>(null);
@@ -56,8 +56,8 @@ export default function Home() {
     let countdown = 0;
     let states = promptStates;
     let maxChars = 36
-    if(textForm.current){
-      maxChars = (textForm.current.offsetWidth-112) * 0.07;
+    if (textForm.current) {
+      maxChars = (textForm.current.offsetWidth - 112) * 0.07;
     }
     const textInterval = setInterval(() => {
       if (states == promptStates && anyTracks) {
@@ -74,8 +74,8 @@ export default function Home() {
       if (stateIndex === states.length) stateIndex = 0;
       if (countdown === 0) {
         const minIndex = Math.max(0, letterIndex - maxChars);
-        if(minIndex>0){
-          countdown=1;
+        if (minIndex > 0) {
+          countdown = 1;
         }
         setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
         letterIndex++;
@@ -93,12 +93,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if(anyTracks){
-      if(!tracks){
+    if (anyTracks) {
+      if (!tracks) {
         setAnyTracks(false);
       }
-    }else{
-      if(tracks){
+    } else {
+      if (tracks) {
         setAnyTracks(true);
       }
     }
@@ -149,15 +149,15 @@ export default function Home() {
     if (loading) return;
     setLoading(true);
 
-    if(text.length > 300){
-      handleErrorUI(); 
+    if (text.length > 300) {
+      handleErrorUI();
       window.alert('Please enter less than 300 characters');
       return;
     }
 
     // return if no text
     if (!text || !text.trim()) {
-      handleErrorUI(); 
+      handleErrorUI();
       window.alert('Please enter some text.');
       return;
     }
@@ -187,8 +187,8 @@ export default function Home() {
         handleErrorUI();
         throw 'OpenAI request timed out';
       }
-      else{      
-        handleErrorUI(); 
+      else {
+        handleErrorUI();
         throw new Error(`Request failed with status ${response.status}`);
       }
     }
@@ -220,9 +220,9 @@ export default function Home() {
     getTracks(songArray);
   }
 
-  async function handleErrorUI(){
+  async function handleErrorUI() {
     setText('');
-    if(blueLoading.current&&blackBackground.current){
+    if (blueLoading.current && blackBackground.current) {
       blueLoading.current.classList.add(styles.faded);
       blackBackground.current.classList.add(styles.faded);
     }
