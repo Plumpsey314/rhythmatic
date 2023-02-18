@@ -104,6 +104,15 @@ export default function Home() {
     }
   }, [tracks])
 
+  async function handleErrorUI() {
+    setText('');
+    if (blueLoading.current && blackBackground.current) {
+      blueLoading.current.classList.add(styles.faded);
+      blackBackground.current.classList.add(styles.faded);
+    }
+    setLoading(false);
+  }
+
   // gets data for given tracks
   async function getTracks(tracksData: string[]) {
     setLoading(false);
@@ -218,15 +227,6 @@ export default function Home() {
 
     // get tracks from song data
     getTracks(songArray);
-  }
-
-  async function handleErrorUI() {
-    setText('');
-    if (blueLoading.current && blackBackground.current) {
-      blueLoading.current.classList.add(styles.faded);
-      blackBackground.current.classList.add(styles.faded);
-    }
-    setLoading(false);
   }
 
   async function loadBox() {
@@ -356,6 +356,10 @@ export default function Home() {
   }
 
   async function finishLoad() {
+    if(!tracks){
+     location.reload();
+     return;   
+    }
     if (blueLoading.current && blackBackground.current) {
       localStorage.setItem('haveBeen', 'true');
       blackBackground.current.classList.remove(styles.faded);
