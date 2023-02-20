@@ -356,10 +356,6 @@ export default function Home() {
   }
 
   async function finishLoad() {
-    if(!tracks){
-     location.reload();
-     return;   
-    }
     if (blueLoading.current && blackBackground.current) {
       localStorage.setItem('haveBeen', 'true');
       blackBackground.current.classList.remove(styles.faded);
@@ -370,7 +366,15 @@ export default function Home() {
       blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
       setAnyTracks(true);
       setText('');
+      let noTracksCount = 0;
       if (blueLoading.current && blackBackground.current) {
+        if(!tracks){
+          noTracksCount++;
+          if(noTracksCount>10){
+            location.reload();
+            return;  
+          } 
+         }
         let count = -50;
         blueLoading.current.style.borderRadius = '8px';
         const fadeBack = setInterval(() => {
