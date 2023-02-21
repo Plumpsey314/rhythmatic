@@ -368,13 +368,13 @@ export default function Home() {
       setText('');
       let noTracksCount = 0;
       if (blueLoading.current && blackBackground.current) {
-        if(!tracks){
+        if (!tracks) {
           noTracksCount++;
-          if(noTracksCount>10){
+          if (noTracksCount > 10) {
             location.reload();
-            return;  
-          } 
-         }
+            return;
+          }
+        }
         let count = -50;
         blueLoading.current.style.borderRadius = '8px';
         const fadeBack = setInterval(() => {
