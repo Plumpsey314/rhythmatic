@@ -102,7 +102,7 @@ export default function Home() {
         setAnyTracks(true);
       }
     }
-  }, [tracks])
+  }, [tracks, anyTracks])
 
   async function handleErrorUI() {
     setText('');
