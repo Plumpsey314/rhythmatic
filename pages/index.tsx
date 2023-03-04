@@ -571,7 +571,7 @@ export default function Home() {
                 open={refineTooltip}
                 onOpen={() => setRefineTooltip(true)}
                 onClose={() => setRefineTooltip(false)}
-                title="Click to refine the results!" arrow componentsProps={{
+                title="Type Text and Click to refine the results!" arrow componentsProps={{
                   tooltip: {
                     sx: {
                       fontSize: "16px"
