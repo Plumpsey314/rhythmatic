@@ -174,10 +174,23 @@ export default function Home() {
     // clear tracks
     setTracks(undefined);
     if (reprompting && !lastResponse) throw 'no last response';
-    const prompt = reprompting ? getReprompt(lastResponse) : getPrompt();
+    const prompt = getPrompt();
 
     // Loading box
     loadBox();
+
+    // If reprompting add the previous prompts on the text
+    const reqText = reprompting ? localStorage.getItem('pastText') + ' ' + text : text;
+
+    // Store the current prompt in local storage.
+    localStorage.setItem('pastText', reqText);
+
+    // Reprompting length limit
+    if (reqText.length > 500) {
+      handleErrorUI();
+      window.alert('Too much reprompt text to handle. Please Start again.');
+      return;
+    }
 
     // make request to chatgpt
     const response = await fetch("/api/openai", {
@@ -185,7 +198,7 @@ export default function Home() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text, prompt })
+      body: JSON.stringify({ text: reqText, prompt })
     });
 
     // parse json data
