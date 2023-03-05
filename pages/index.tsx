@@ -393,8 +393,8 @@ export default function Home() {
             if(songTrack.current){
               definatelyTracks = true;
             }else{
-              // Wait one second for track to load just to be safe (sometimes it takes 200 ms).
-              if(noTracksCount>200){
+              // Wait two seconds for track to load just to be safe (sometimes it takes 200 ms).
+              if(noTracksCount>1000){
                 clearInterval(fadeBack);
                 window.alert('Sorry: no songs met that request');
                 location.reload();
