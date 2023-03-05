@@ -104,13 +104,9 @@ export default function Home() {
     }
   }, [tracks, anyTracks])
 
+  //This just reloads the page right now. Leaving it here in case we want to do something else.
   async function handleErrorUI() {
-    setText('');
-    if (blueLoading.current && blackBackground.current) {
-      blueLoading.current.classList.add(styles.faded);
-      blackBackground.current.classList.add(styles.faded);
-    }
-    setLoading(false);
+    location.reload();
   }
 
   // gets data for given tracks
@@ -222,7 +218,8 @@ export default function Home() {
     if (bracketIndex === -1) {
       setLoading(false);
       handleErrorUI();
-      window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+      //window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+      window.alert(`Invalid result from ChatGPT : 'No response'`);
       throw 'invalid result';
     }
     raw = raw.substring(bracketIndex);
@@ -397,11 +394,11 @@ export default function Home() {
               if(noTracksCount>200){
                 clearInterval(fadeBack);
                 window.alert('Sorry: no songs met that request');
-            location.reload();
-            return;
-          }
+                location.reload();
+                return;
+              }
               noTracksCount++;
-        }
+            }
           }
           if (blueLoading.current && blackBackground.current && songTrack.current) {
 
