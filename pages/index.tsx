@@ -153,6 +153,12 @@ export default function Home() {
 
   // generates songs from chatgpt
   async function generateSongs(reprompting: boolean) {
+      // return if no text
+      if (!text || !text.trim()) {
+        window.alert('Please enter some text.');
+        return;
+      }
+
     // update loading state
     if (loading) return;
     setLoading(true);
@@ -160,13 +166,6 @@ export default function Home() {
     if (text.length > 300) {
       handleErrorUI();
       window.alert('Please enter less than 300 characters');
-      return;
-    }
-
-    // return if no text
-    if (!text || !text.trim()) {
-      handleErrorUI();
-      window.alert('Please enter some text.');
       return;
     }
 
