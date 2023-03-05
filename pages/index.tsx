@@ -419,6 +419,7 @@ export default function Home() {
                 if (textForm.current) {
                   textForm.current.style.pointerEvents = 'all';
                 }
+                songTrack.current.style.zIndex = '8';
                 blackBackground.current.style.zIndex = '9';
                 blackBackground.current.classList.add(styles.faded);
                 if (localStorage.getItem('haveBeen') == 'false' && refinePopup.current) {
