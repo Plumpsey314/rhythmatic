@@ -104,13 +104,9 @@ export default function Home() {
     }
   }, [tracks, anyTracks])
 
+  //This just reloads the page right now. Leaving it here in case we want to do something else.
   async function handleErrorUI() {
-    setText('');
-    if (blueLoading.current && blackBackground.current) {
-      blueLoading.current.classList.add(styles.faded);
-      blackBackground.current.classList.add(styles.faded);
-    }
-    setLoading(false);
+    location.reload();
   }
 
   // gets data for given tracks
@@ -222,7 +218,8 @@ export default function Home() {
     if (bracketIndex === -1) {
       setLoading(false);
       handleErrorUI();
-      window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+      //window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+      window.alert(`Invalid result from ChatGPT : 'No response'`);
       throw 'invalid result';
     }
     raw = raw.substring(bracketIndex);
@@ -379,19 +376,32 @@ export default function Home() {
       blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
       setAnyTracks(true);
       setText('');
-      let noTracksCount = 0;
+
       if (blueLoading.current && blackBackground.current) {
-        if (!tracks) {
-          noTracksCount++;
-          if (noTracksCount > 10) {
-            location.reload();
-            return;
-          }
-        }
         let count = -50;
         blueLoading.current.style.borderRadius = '8px';
+
+        // To catch when ChatGPT returns no songs (but no other error occurs)
+        let noTracksCount = 0;
+        let definatelyTracks = false;
         const fadeBack = setInterval(() => {
+          // Tracks might not imidiately load, so something like if(!songTrack.current)window.alert would not work.
+          if(!definatelyTracks){
+            if(songTrack.current){
+              definatelyTracks = true;
+            }else{
+              // Wait one second for track to load just to be safe (sometimes it takes 200 ms).
+              if(noTracksCount>200){
+                clearInterval(fadeBack);
+                window.alert('Sorry: no songs met that request');
+                location.reload();
+                return;
+              }
+              noTracksCount++;
+            }
+          }
           if (blueLoading.current && blackBackground.current && songTrack.current) {
+
             if (count <= 0) {
               if (songTrack.current) {
                 songTrack.current.style.zIndex = '10';
@@ -419,6 +429,7 @@ export default function Home() {
                 if (textForm.current) {
                   textForm.current.style.pointerEvents = 'all';
                 }
+                songTrack.current.style.zIndex = '8';
                 blackBackground.current.style.zIndex = '9';
                 blackBackground.current.classList.add(styles.faded);
                 if (localStorage.getItem('haveBeen') == 'false' && refinePopup.current) {
