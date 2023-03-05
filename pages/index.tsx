@@ -34,21 +34,21 @@ export default function Home() {
   // set up text placeholder typing effect
   useEffect(() => {
     const promptStates = [
-      'I am going on a long car ride through the mountains and want music that will keep me from falling asleep',
-      'I\'m having a party and want songs that will keep everyone dancing',
-      'I want to feel empowered, play me some empowering pop songs',
-      'songs for running',
-      'rap songs for a hard workout',
+      'I am going on a long car ride through the mountains and want music that will keep me from falling asleep.',
+      'I\'m having a party and want songs that will keep everyone dancing.',
+      'I want to feel empowered, play me some empowering pop songs.',
+      'Songs for running',
+      'Rap songs for a hard workout',
       'I\'m in the mood for throwback hits from the 90s and 2000s',
       'I am playing chess and I want music that won\'t distract me but will keep me happy.'
     ];
     const repromptStates = [
       'Only popular rap music',
-      'Make them sad but still empowering',
-      'Only happy music',
-      'make them energizing',
-      'Can you only find rap or pop music from after 2020',
-      'Only electronic music though',
+      'Make them sad but still empowering.',
+      'Only happy music.',
+      'Make them energizing.',
+      'Can you only find rap or pop music from after 2017',
+      'Only electronic music though.',
       'Can you make it very chill pop music?'
     ];
     let stateIndex = 0;
@@ -57,7 +57,10 @@ export default function Home() {
     let states = promptStates;
     let maxChars = 36
     if (textForm.current) {
-      maxChars = (textForm.current.offsetWidth - 112) * 0.07;
+      maxChars = (textForm.current.offsetWidth - 112) * 0.075;
+    }
+    if(!anyTracks){
+      maxChars += 2;
     }
     const textInterval = setInterval(() => {
       if (states == promptStates && anyTracks) {
@@ -245,7 +248,7 @@ export default function Home() {
       if (textForm.current) {
         textForm.current.blur();
         textForm.current.style.pointerEvents = 'none';
-        textForm.current.style.paddingRight = '100px';
+        textForm.current.style.paddingRight = '90px';
       }
       let top = 0;
       let left = 0;
