@@ -379,19 +379,32 @@ export default function Home() {
       blueLoading.current.style.boxShadow = 'inset -3px -3px 5px #2600BF, inset 3px 3px 5px #2600BF';
       setAnyTracks(true);
       setText('');
-      let noTracksCount = 0;
+
       if (blueLoading.current && blackBackground.current) {
-        if (!tracks) {
-          noTracksCount++;
-          if (noTracksCount > 10) {
+        let count = -50;
+        blueLoading.current.style.borderRadius = '8px';
+
+        // To catch when ChatGPT returns no songs (but no other error occurs)
+        let noTracksCount = 0;
+        let definatelyTracks = false;
+        const fadeBack = setInterval(() => {
+          // Tracks might not imidiately load, so something like if(!songTrack.current)window.alert would not work.
+          if(!definatelyTracks){
+            if(songTrack.current){
+              definatelyTracks = true;
+            }else{
+              // Wait one second for track to load just to be safe (sometimes it takes 200 ms).
+              if(noTracksCount>200){
+                clearInterval(fadeBack);
+                window.alert('Sorry: no songs met that request');
             location.reload();
             return;
           }
+              noTracksCount++;
         }
-        let count = -50;
-        blueLoading.current.style.borderRadius = '8px';
-        const fadeBack = setInterval(() => {
+          }
           if (blueLoading.current && blackBackground.current && songTrack.current) {
+
             if (count <= 0) {
               if (songTrack.current) {
                 songTrack.current.style.zIndex = '10';
