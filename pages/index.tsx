@@ -14,6 +14,7 @@ export default function Home() {
   const [email, setEmail] = useState('');
   const [popupOpen, setPopupOpen] = useState(false);
   const [text, setText] = useState('');
+  const [messages, setMessages] = useState<string[]>([]);
   const [textPlaceholder, setTextPlaceholder] = useState('');
   const [lastResponse, setLastResponse] = useState('');
   const [tracks, setTracks] = useState<any[]>();
@@ -175,14 +176,17 @@ export default function Home() {
     // Loading box
     loadBox();
 
-    // If reprompting add the previous prompts on the text
-    const reqText = reprompting ? localStorage.getItem('pastText') + ' ' + text : text;
+    const newText = [...messages, text]
 
-    // Store the current prompt in local storage.
-    localStorage.setItem('pastText', reqText);
+    let totalLength = 0;
+    newText.forEach(text => {
+      totalLength += text.length;
+    });
+
+    setMessages(newText);
 
     // Reprompting length limit
-    if (reqText.length > 500) {
+    if (totalLength > 500) {
       handleErrorUI();
       window.alert('Too much reprompt text to handle. Please Start again.');
       return;
@@ -194,7 +198,7 @@ export default function Home() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: reqText })
+      body: JSON.stringify({ texts: newText })
     });
 
     // parse json data

@@ -17,26 +17,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
 
-  const text = req.body.text || '';
-  if (text.trim().length === 0) {
-    res.status(400).json({
-      error: {
-        message: "Please enter a valid text",
-      }
-    });
-    return;
-  }
-
   const prompt = getPrompt();
 
+  const chatHistory = req.body.texts.map((message: string) => {
+    return {"role": "user", "content": `${message}`}
+  })
+
+  const messages = [{"role": "system", "content": `${prompt}`}, ...chatHistory];
+
+
   try {
-    console.log(text);
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
-      messages: [
-            {"role": "system", "content": `${prompt}`},
-            {"role": "user", "content": `${text}`},
-        ],
+      messages: messages,
       temperature: 0.7,
       max_tokens: 256
     });
