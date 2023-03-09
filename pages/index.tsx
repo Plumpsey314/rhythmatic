@@ -1,6 +1,5 @@
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
-import { getPrompt, getReprompt } from '@/util/prompt';
 import { Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { useSession } from 'next-auth/react';
@@ -172,7 +171,6 @@ export default function Home() {
     // clear tracks
     setTracks(undefined);
     if (reprompting && !lastResponse) throw 'no last response';
-    const prompt = getPrompt();
 
     // Loading box
     loadBox();
@@ -196,7 +194,7 @@ export default function Home() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: reqText, prompt })
+      body: JSON.stringify({ text: reqText })
     });
 
     // parse json data
