@@ -41,7 +41,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             "Here are some recommendations for happy songs:\\n 1. "Happy" - Pharrell Williams\\n2. "Can't Stop the Feeling!" - ustin Timberlake\\n3. "Shut Up and Dance" - Walk the Moon"
             `},
             {"role": "user", "content": `${text}`},
-        ]
+        ],
+      temperature: 0.7,
+      max_tokens: 256
     });
     if(completion.data.choices[0].message){
       console.log("The data:")
