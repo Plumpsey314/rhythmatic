@@ -34,14 +34,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       max_tokens: 256
     });
     if(completion.data.choices[0].message){
-      console.log("The data:")
-      console.log(completion.data.choices[0].message.content);
       res.status(200).json({ result: completion.data.choices[0].message.content });
     }else{
       throw 'completion.data.choices[0].message is undefined'
     }
   } catch (error: any) {
-    console.log("BRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUVY")
     // Consider adjusting the error handling logic for your use case
     if (error.response) {
       console.error(error.response.status, error.response.data);
