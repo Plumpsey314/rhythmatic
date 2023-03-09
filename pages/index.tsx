@@ -220,8 +220,8 @@ export default function Home() {
     if (bracketIndex === -1) {
       setLoading(false);
       handleErrorUI();
-      //window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
-      window.alert(`Invalid result from ChatGPT : 'No response'`);
+      window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+      // window.alert(`Invalid result from ChatGPT : 'No response'`);
       throw 'invalid result';
     }
     raw = raw.substring(bracketIndex);

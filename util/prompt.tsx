@@ -1,5 +1,6 @@
 export function getPrompt() {
-  return `Create AI music chatbot. Suggest 10 unique songs matching user query. Only use songs on Spotify. Prioritize relevance, diversity, serendipity, and popularity/recency. Handle 'similar' queries, exclude specified artists. Return recommendations as JS arrays [song, artist]. Example: Query 'happy pop songs' -> ["Happy\\nPharrell Williams", "Can't Stop the Feeling!\\nJustin Timberlake", "Shut Up and Dance\\nWalk the Moon", etc].`;
+  return '';
+  // return `Suggest 10 unique songs matching user query. Only use songs on Spotify. Prioritize relevance, diversity, serendipity, and popularity/recency. Handle 'similar' queries, exclude specified artists.`;
 }
 
 // Currently not used; Instead we are using the prompt function for reprompting.
