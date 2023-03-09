@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
+import { getPrompt } from '@/util/prompt';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,26 +17,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
 
-  const text = req.body.text || '';
-  if (text.trim().length === 0) {
-    res.status(400).json({
-      error: {
-        message: "Please enter a valid text",
-      }
-    });
-    return;
-  }
+  const prompt = getPrompt();
 
-  const { prompt } = req.body;
+  const chatHistory = req.body.texts.map((message: string) => {
+    return {"role": "user", "content": `${message}`}
+  })
+
+  const messages = [{"role": "system", "content": `${prompt}`}, ...chatHistory];
+
 
   try {
-    const completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: `${prompt}${text} -> `,
-      temperature: .7,
+    const completion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: messages,
+      temperature: 0.7,
       max_tokens: 256
     });
-    res.status(200).json({ result: completion.data.choices[0].text });
+    if(completion.data.choices[0].message){
+      res.status(200).json({ result: completion.data.choices[0].message.content });
+    }else{
+      throw 'completion.data.choices[0].message is undefined'
+    }
   } catch (error: any) {
     // Consider adjusting the error handling logic for your use case
     if (error.response) {

@@ -1,6 +1,5 @@
 import Track from '@/components/Track';
 import styles from '@/styles/pages/Index.module.scss';
-import { getPrompt, getReprompt } from '@/util/prompt';
 import { Tooltip } from '@mui/material';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { useSession } from 'next-auth/react';
@@ -15,6 +14,7 @@ export default function Home() {
   const [email, setEmail] = useState('');
   const [popupOpen, setPopupOpen] = useState(false);
   const [text, setText] = useState('');
+  const [messages, setMessages] = useState<string[]>([]);
   const [textPlaceholder, setTextPlaceholder] = useState('');
   const [lastResponse, setLastResponse] = useState('');
   const [tracks, setTracks] = useState<any[]>();
@@ -172,19 +172,21 @@ export default function Home() {
     // clear tracks
     setTracks(undefined);
     if (reprompting && !lastResponse) throw 'no last response';
-    const prompt = getPrompt();
 
     // Loading box
     loadBox();
 
-    // If reprompting add the previous prompts on the text
-    const reqText = reprompting ? localStorage.getItem('pastText') + ' ' + text : text;
+    const newText = [...messages, text]
 
-    // Store the current prompt in local storage.
-    localStorage.setItem('pastText', reqText);
+    let totalLength = 0;
+    newText.forEach(text => {
+      totalLength += text.length;
+    });
+
+    setMessages(newText);
 
     // Reprompting length limit
-    if (reqText.length > 500) {
+    if (totalLength > 500) {
       handleErrorUI();
       window.alert('Too much reprompt text to handle. Please Start again.');
       return;
@@ -196,7 +198,7 @@ export default function Home() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: reqText, prompt })
+      body: JSON.stringify({ texts: newText })
     });
 
     // parse json data
@@ -220,7 +222,7 @@ export default function Home() {
     if (bracketIndex === -1) {
       setLoading(false);
       handleErrorUI();
-      //window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+      // window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
       window.alert(`Invalid result from ChatGPT : 'No response'`);
       throw 'invalid result';
     }
