@@ -34,10 +34,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       model: "gpt-3.5-turbo",
       messages: [
             {"role": "system", "content": `
-            Even when you do not understand the request, your responce is always a javascript array of ten songs on spotify. Each Element of the array should have the song title then "\\n" then the artist. Always include square brackets [] encapsulating the suggestions.
-            An example good responce is: 
+            Even when you do not understand the request, your response is always a javascript array of ten songs on spotify. Each Element of the array should have the song title then "\\n" then the artist. Always include square brackets [] encapsulating the suggestions.
+            An example good response is: 
             ["Happy\\nPharrell Williams", "Can't Stop the Feeling!\\nJustin Timberlake", "Shut Up and Dance\\nWalk the Moon", etc].
-            An example bad responce is:
+            An example bad response is:
             "Here are some recommendations for happy songs:\\n 1. "Happy" - Pharrell Williams\\n2. "Can't Stop the Feeling!" - ustin Timberlake\\n3. "Shut Up and Dance" - Walk the Moon"
             `},
             {"role": "user", "content": `${text}`},
