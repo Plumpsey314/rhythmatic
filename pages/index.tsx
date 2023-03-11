@@ -492,8 +492,8 @@ export default function Home() {
       <div className={styles.spotifyContainer}>
         <Image
               src="/img/spotify_logo.png"
-              width="140"
-              height="40"
+              width="112"
+              height="32"
               alt="spotify_logo.png"
         />
         {
