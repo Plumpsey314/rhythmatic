@@ -124,7 +124,15 @@ export default function Home() {
         return;
       }
       const trackData = tracksData[index];
-      const [song, artist] = trackData.split('\n');
+      let [song, artist] = trackData.split('\n');
+      if(!artist){
+        [song, artist] = trackData.split(' - ');
+        if(!artist){
+          handleErrorUI();
+          window.alert("can not parse ChatGPT's response");
+          return;
+        }
+      }
       const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
       // handle api error
       if (response.status !== 200) {
@@ -218,8 +226,10 @@ export default function Home() {
 
     // parse raw result
     let raw = data.result.trim();
+    window.alert(raw);
     const bracketIndex = raw.indexOf('[');
     if (bracketIndex === -1) {
+      //TODO: I can make this work if it is a numbered list
       setLoading(false);
       handleErrorUI();
       window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
