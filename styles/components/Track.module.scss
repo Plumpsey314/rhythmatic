@@ -64,6 +64,7 @@
     &.lonely {
       margin-right: -16px;
     }
+
   }
 
   >.save {
@@ -91,5 +92,12 @@
         background: #3c2eff;
       }
     }
+  }
+
+  .trackIcon {
+    height: 12px;
+    position: absolute;
+    bottom: 32px;
+    right: 18px;
   }
 }
