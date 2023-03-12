@@ -125,7 +125,6 @@ export default function Home() {
       }
       // Makes sure trackData does not have any " character
       let trackData = tracksData[index].split('"').join('');
-      console.log(trackData);
       // songs should be split by \n but if chatGPT might occasionally split it by something else.
       let [song, artist] = trackData.split('\n');
       if(!artist){
@@ -232,7 +231,6 @@ export default function Home() {
 
     // parse raw result
     let raw = data.result.trim();
-    window.alert(raw);
 
     // parse song array
     let songArray: string[];
@@ -259,8 +257,8 @@ export default function Home() {
       if(songArray.length==0){
         setLoading(false);
         handleErrorUI();
-        window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
-        // window.alert(`Invalid result from ChatGPT : 'No response'`);
+        // window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+        window.alert(`Invalid result from ChatGPT : 'No response'`);
         throw 'invalid result';
       }
     }else{
@@ -278,14 +276,6 @@ export default function Home() {
 
     // get tracks from song data
     getTracks(songArray);
-
-    // // error if we could not find any songs
-    // if(!tracks){
-    //   setLoading(false);
-    //   handleErrorUI();
-    //   window.alert("Sorry, we could not find any songs that match your request.");
-    //   return;
-    // }
   }
 
   async function loadBox() {
