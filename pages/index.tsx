@@ -258,8 +258,8 @@ export default function Home() {
       if(songArray.length==0){
         setLoading(false);
         handleErrorUI();
-        // window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
-        window.alert(`Invalid result from ChatGPT : 'No response'`);
+        window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+        // window.alert(`Invalid result from ChatGPT`);
         throw 'invalid result';
       }
     }else{
