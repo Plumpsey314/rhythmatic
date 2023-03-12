@@ -189,7 +189,8 @@ export default function Home() {
     // Loading box
     loadBox();
 
-    const newText = [...messages, text]
+    // set new text as message history when reprompting, or the origional message when not reprompting
+    const newText = reprompting?[...messages, text]:[text];
 
     let totalLength = 0;
     newText.forEach(text => {
