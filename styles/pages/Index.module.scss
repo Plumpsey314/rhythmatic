@@ -58,10 +58,6 @@
     justify-content: center;
     z-index: 5;
 
-    @media (max-width: 513.98px) {
-      display: none;
-    }
-
     >img {
       margin-right: 4px;
     }
@@ -297,13 +293,18 @@
     .tracks {
       flex-direction: column;
       align-items: center;
-      overflow: auto;
       display: flex;
-      margin: 120px 0 40px 0;
+      margin: 180px 0 40px 0;
       overflow: hidden;
 
-      @media (max-width: 1199.98px) {
-        margin-top: 180px;
+      .transparent {
+        display: none;
+        height: 108px;
+        width: 100px;
+
+        @media (max-width: 599.98px) {
+          display: flex;
+        }
       }
     }
   }
