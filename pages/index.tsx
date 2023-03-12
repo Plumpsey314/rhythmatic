@@ -116,37 +116,40 @@ export default function Home() {
   async function getTracks(tracksData: string[]) {
     setLoading(false);
     setTracks([]);
-    let index = 0;
+    let index: number = 0;
     let allTracks: any[] = [];
     async function makeRequest(tracksData: string[]) {
       if (index === tracksData.length) {
         setTracks(allTracks);
         return;
       }
-      const trackData = tracksData[index];
+      // Makes sure trackData does not have any " character
+      let trackData = tracksData[index].split('"').join('');
+      console.log(trackData);
+      // songs should be split by \n but if chatGPT might occasionally split it by something else.
       let [song, artist] = trackData.split('\n');
       if(!artist){
-        [song, artist] = trackData.split(' by ');
+        [song, artist] = trackData.split('\\n');
         if(!artist){
-          [song, artist] = trackData.split(' - ');
+          [song, artist] = trackData.split(' by ');
           if(!artist){
-            handleErrorUI();
-            window.alert("can not parse ChatGPT's response");
-            return;
+            [song, artist] = trackData.split(' - ');
           }
         }
       }
-      const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
-      // handle api error
-      if (response.status !== 200) {
-        window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
-        return;
-      }
-      const data = await response.json();
-      const track = data?.tracks?.items[0];
-      if (track) {
-        setTracks(tracks => tracks ? [...tracks, track] : [track]);
-        allTracks.push(track);
+      if(artist){
+        const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
+        // handle api error
+        if (response.status !== 200) {
+          window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
+          return;
+        }
+        const data = await response.json();
+        const track = data?.tracks?.items[0];
+        if (track) {
+          setTracks(tracks => tracks ? [...tracks, track] : [track]);
+          allTracks.push(track);
+        }
       }
       index++;
       makeRequest(tracksData);
@@ -240,7 +243,7 @@ export default function Home() {
       let keepGoing: boolean = true;
       let songNumber: number = 1;
       songArray = [];
-      while(keepGoing||songNumber<=10){
+      while(keepGoing&&songNumber<=10){
         if(raw.includes(songNumber+".")){
           if(raw.includes((songNumber+1)+".")){
             songArray.push(raw.substring(raw.indexOf(songNumber+".")+2, raw.indexOf((songNumber+1)+".")).trim());
@@ -275,6 +278,14 @@ export default function Home() {
 
     // get tracks from song data
     getTracks(songArray);
+
+    // // error if we could not find any songs
+    // if(!tracks){
+    //   setLoading(false);
+    //   handleErrorUI();
+    //   window.alert("Sorry, we could not find any songs that match your request.");
+    //   return;
+    // }
   }
 
   async function loadBox() {
