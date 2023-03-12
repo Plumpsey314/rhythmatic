@@ -118,26 +118,39 @@ export default function Home() {
   async function getTracks(tracksData: string[]) {
     setLoading(false);
     setTracks([]);
-    let index = 0;
+    let index: number = 0;
     let allTracks: any[] = [];
     async function makeRequest(tracksData: string[]) {
       if (index === tracksData.length) {
         setTracks(allTracks);
         return;
       }
-      const trackData = tracksData[index];
-      const [song, artist] = trackData.split('\n');
-      const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
-      // handle api error
-      if (response.status !== 200) {
-        window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
-        return;
+      // Makes sure trackData does not have any " character
+      let trackData = tracksData[index].split('"').join('');
+      // songs should be split by \n but if chatGPT might occasionally split it by something else.
+      let [song, artist] = trackData.split('\n');
+      if(!artist){
+        [song, artist] = trackData.split('\\n');
+        if(!artist){
+          [song, artist] = trackData.split(' by ');
+          if(!artist){
+            [song, artist] = trackData.split(' - ');
+          }
+        }
       }
-      const data = await response.json();
-      const track = data?.tracks?.items[0];
-      if (track) {
-        setTracks(tracks => tracks ? [...tracks, track] : [track]);
-        allTracks.push(track);
+      if(artist){
+        const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
+        // handle api error
+        if (response.status !== 200) {
+          window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
+          return;
+        }
+        const data = await response.json();
+        const track = data?.tracks?.items[0];
+        if (track) {
+          setTracks(tracks => tracks ? [...tracks, track] : [track]);
+          allTracks.push(track);
+        }
       }
       index++;
       makeRequest(tracksData);
@@ -178,7 +191,8 @@ export default function Home() {
     // Loading box
     loadBox();
 
-    const newText = [...messages, text]
+    // set new text as message history when reprompting, or the origional message when not reprompting
+    const newText = reprompting?[...messages, text]:[text];
 
     let totalLength = 0;
     newText.forEach(text => {
@@ -220,26 +234,48 @@ export default function Home() {
 
     // parse raw result
     let raw = data.result.trim();
-    const bracketIndex = raw.indexOf('[');
-    if (bracketIndex === -1) {
-      setLoading(false);
-      handleErrorUI();
-      window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
-      // window.alert(`Invalid result from ChatGPT : 'No response'`);
-      throw 'invalid result';
-    }
-    raw = raw.substring(bracketIndex);
-    setLastResponse(raw);
 
     // parse song array
     let songArray: string[];
-    try {
-      songArray = JSON.parse(raw);
-    } catch (e) {
-      setLoading(false);
-      handleErrorUI();
-      throw `Something went wrong parsing the result: ${e}`;
+
+    const bracketIndex = raw.indexOf('[');
+    if (bracketIndex === -1) {
+      // Try to make it work
+      let keepGoing: boolean = true;
+      let songNumber: number = 1;
+      songArray = [];
+      while(keepGoing&&songNumber<=10){
+        if(raw.includes(songNumber+".")){
+          if(raw.includes((songNumber+1)+".")){
+            songArray.push(raw.substring(raw.indexOf(songNumber+".")+2, raw.indexOf((songNumber+1)+".")).trim());
+          }else{
+            songArray.push(raw.substring(raw.indexOf(songNumber+".")+(songNumber==10?3:2)).trim());
+          }
+          songNumber++;
+        }else{
+          keepGoing=false;
+        }   
+      }
+      // What to do if it does not work
+      if(songArray.length==0){
+        setLoading(false);
+        handleErrorUI();
+        // window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+        window.alert(`Invalid result from ChatGPT`);
+        throw 'invalid result';
+      }
+    }else{
+      raw = raw.substring(bracketIndex);
+      try {
+        songArray = JSON.parse(raw);
+      } catch (e) {
+        setLoading(false);
+        handleErrorUI();
+        throw `Something went wrong parsing the result: ${e}`;
+      }
     }
+
+    setLastResponse(raw);
 
     // get tracks from song data
     getTracks(songArray);
