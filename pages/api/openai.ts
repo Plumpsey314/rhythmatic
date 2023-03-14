@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
-import { getPrompt } from '@/util/prompt';
+import { getFixingPromptPrompt, getGPT3Prompt, getPrompt } from '@/util/prompt';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,8 +16,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     return;
   }
-
-  const prompt = getPrompt();
+  
+  let prompt = "";
+  if(req.body.mode == "suggest") {
+    prompt = getPrompt();
+  }
+  if(req.body.mode == "fix prompt") {
+    prompt = getFixingPromptPrompt();
+  }
+  if(req.body.mode == "gpt3") {
+    prompt = getGPT3Prompt();
+  }
 
   const chatHistory = req.body.texts.map((message: string) => {
     return {"role": "user", "content": `${message}`}
@@ -25,6 +34,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const messages = [{"role": "system", "content": `${prompt}`}, ...chatHistory];
 
+  if(prompt==""){
+    throw "Could not load the prompt to give to ChatGPT"
+  }
 
   try {
     const completion = await openai.createChatCompletion({

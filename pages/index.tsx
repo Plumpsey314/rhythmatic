@@ -113,11 +113,12 @@ export default function Home() {
   }
 
   // gets data for given tracks
-  async function getTracks(tracksData: string[]) {
+  async function getTracks(tracksData: string[], fixingPrompt: boolean) {
     setLoading(false);
     setTracks([]);
     let index: number = 0;
     let allTracks: any[] = [];
+    let anything: boolean = false;
     async function makeRequest(tracksData: string[]) {
       if (index === tracksData.length) {
         setTracks(allTracks);
@@ -143,17 +144,96 @@ export default function Home() {
           window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
           return;
         }
+        anything = true;
         const data = await response.json();
         const track = data?.tracks?.items[0];
         if (track) {
           setTracks(tracks => tracks ? [...tracks, track] : [track]);
           allTracks.push(track);
         }
+        console.log(anything);
       }
       index++;
       makeRequest(tracksData);
     }
-    makeRequest(tracksData);
+    await makeRequest(tracksData);
+
+    if(!anything&&fixingPrompt){
+      // make request to chatgpt
+      const response = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ texts: ["[" + tracksData.toString() + "]"], mode: "fix prompt" })
+      });
+
+      // parse json data
+      if (response.status !== 200) {
+        setLoading(false);
+        if (response.status === 504) {
+          window.alert('Error: OpenAI did not return a response in time');
+          handleErrorUI();
+          throw 'OpenAI request timed out';
+        }
+        else {
+          handleErrorUI();
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+      }
+      const data = await response.json();
+
+      // parse raw result
+      let raw = data.result.trim();
+
+      window.alert(raw);
+
+      // parse song array
+      let songArray: string[];
+
+      const bracketIndex = raw.indexOf('[');
+      if (bracketIndex === -1) {
+        // Try to make it work
+        let keepGoing: boolean = true;
+        let songNumber: number = 1;
+        songArray = [];
+        while(keepGoing&&songNumber<=10){
+          if(raw.includes(songNumber+".")){
+            if(raw.includes((songNumber+1)+".")){
+              songArray.push(raw.substring(raw.indexOf(songNumber+".")+2, raw.indexOf((songNumber+1)+".")).trim());
+            }else{
+              songArray.push(raw.substring(raw.indexOf(songNumber+".")+(songNumber==10?3:2)).trim());
+            }
+            songNumber++;
+          }else{
+            keepGoing=false;
+          }   
+        }
+        // What to do if it does not work
+        if(songArray.length==0){
+          setLoading(false);
+          handleErrorUI();
+          // window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
+          window.alert(`Invalid result from ChatGPT`);
+          throw 'invalid result';
+        }
+      }else{
+        raw = raw.substring(bracketIndex);
+        try {
+          songArray = JSON.parse(raw);
+        } catch (e) {
+          setLoading(false);
+          handleErrorUI();
+          throw `Something went wrong parsing the result: ${e}`;
+        }
+      }
+
+      setLastResponse(raw);
+
+      // get tracks from song data We are not fixing the prompt again. That will set up an infinite recursive loop
+      // NEVER change this to true.
+      getTracks(songArray, false);
+    }
   }
 
   // collects an email and saves it to localstorage and firebase
@@ -212,7 +292,7 @@ export default function Home() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ texts: newText })
+      body: JSON.stringify({ texts: newText, mode: "suggest" })
     });
 
     // parse json data
@@ -232,6 +312,8 @@ export default function Home() {
 
     // parse raw result
     let raw = data.result.trim();
+
+    window.alert(raw);
 
     // parse song array
     let songArray: string[];
@@ -276,7 +358,7 @@ export default function Home() {
     setLastResponse(raw);
 
     // get tracks from song data
-    getTracks(songArray);
+    getTracks(songArray, true);
   }
 
   async function loadBox() {
@@ -421,25 +503,25 @@ export default function Home() {
         let count = -50;
         blueLoading.current.style.borderRadius = '8px';
 
-        // To catch when ChatGPT returns no songs (but no other error occurs)
-        let noTracksCount = 0;
-        let definatelyTracks = false;
+        // // To catch when ChatGPT returns no songs (but no other error occurs)
+        // let noTracksCount = 0;
+        // let definatelyTracks = false;
         const fadeBack = setInterval(() => {
-          // Tracks might not imidiately load, so something like if(!songTrack.current)window.alert would not work.
-          if(!definatelyTracks){
-            if(songTrack.current){
-              definatelyTracks = true;
-            }else{
-              // Wait two seconds for track to load just to be safe (sometimes it takes 200 ms).
-              if(noTracksCount>1000){
-                clearInterval(fadeBack);
-                window.alert('Sorry: no songs met that request');
-                location.reload();
-                return;
-              }
-              noTracksCount++;
-            }
-          }
+          // // Tracks might not imidiately load, so something like if(!songTrack.current)window.alert would not work.
+          // if(!definatelyTracks){
+          //   if(songTrack.current){
+          //     definatelyTracks = true;
+          //   }else{
+          //     // Wait two seconds for track to load just to be safe (sometimes it takes 200 ms).
+          //     if(noTracksCount>1000){
+          //       clearInterval(fadeBack);
+          //       window.alert('Sorry: no songs met that request');
+          //       location.reload();
+          //       return;
+          //     }
+          //     noTracksCount++;
+          //   }
+          // }
           if (blueLoading.current && blackBackground.current && songTrack.current) {
 
             if (count <= 0) {
