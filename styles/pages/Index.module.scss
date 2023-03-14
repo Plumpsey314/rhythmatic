@@ -80,6 +80,15 @@
     color: #fff;
     z-index: 5;
 
+    img {
+      @media(max-width: 1199.98px) {
+        position: absolute;
+        right: 12px;
+        top: 0px;
+        margin-top: 12px;
+      }
+    }
+
     .accountButton {
       width: 225px;
       font-size: 24px;
@@ -94,6 +103,14 @@
       &:hover {
         background: #171717;
       }
+
+      @media(max-width: 1199.98px) {
+        margin-top: 60px !important;
+      }
+
+      @media(max-width: 1199.98px) {
+        right: 8px;
+      }      
     }
   }
 
@@ -245,7 +262,7 @@
           z-index: 10;
 
           @media (max-width: 1199.98px) {
-            top: 104px;
+            top: 160px;
           }
         }
 
@@ -294,17 +311,16 @@
       flex-direction: column;
       align-items: center;
       display: flex;
-      margin: 180px 0 40px 0;
-      overflow: hidden;
+      margin: 120px 0 20px 0;
 
-      .transparent {
-        display: none;
-        height: 108px;
-        width: 100px;
+      @media (max-width: 1199.98px) {
+        margin-top: 215px;
+        overflow: auto;
+        max-height: 550px;
+      }
 
-        @media (max-width: 599.98px) {
-          display: flex;
-        }
+      @media (max-width: 550px) {
+        
       }
     }
   }
