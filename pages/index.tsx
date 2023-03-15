@@ -120,11 +120,9 @@ export default function Home() {
       setLoading(false);
       if (res.status === 504) {
         window.alert('Error: OpenAI did not return a response in time');
-        handleErrorUI();
         throw 'OpenAI request timed out';
       }
       else {
-        handleErrorUI();
         throw new Error(`Request failed with status ${res.status}`);
       }
     }
@@ -159,10 +157,9 @@ export default function Home() {
       // What to do if it does not work
       if(songArray.length==0){
         setLoading(false);
-        handleErrorUI();
         // window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
         window.alert(`Invalid result from ChatGPT`);
-        throw 'invalid result';
+        throw 'Invalid Result';
       }
     }else{
       raw = raw.substring(bracketIndex);
@@ -170,7 +167,6 @@ export default function Home() {
         songArray = JSON.parse(raw);
       } catch (e) {
         setLoading(false);
-        handleErrorUI();
         throw `Something went wrong parsing the result: ${e}`;
       }
     }
@@ -218,7 +214,8 @@ export default function Home() {
         const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
         // handle api error
         if (response.status !== 200) {
-          window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
+          // Commenting this line out since it sometimes alerts user because of one song despite having other perfectly good songs
+          // window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
           return;
         }
         anything = true;
@@ -235,30 +232,35 @@ export default function Home() {
     }
     await makeRequest(tracksData);
 
-    if(!anything&&fixingPrompt){
-      setLoading(true);
+    if(!anything){
+      if(fixingPrompt){
+        setLoading(true);
 
-      // make request to chatgpt
-      const response = await fetch("/api/openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ texts: ["[" + tracksData.toString() + "]"], mode: "fix prompt" })
-      });
-
-      // NEVER change this to true. It can create an infinite loop and charge us a bunch.
-      resHandling(response, false);
+        // make request to chatgpt
+        const response = await fetch("/api/openai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ texts: ["[" + tracksData.toString() + "]"], mode: "fix prompt" })
+        });
+  
+        // NEVER change this to true. It can create an infinite loop and charge us a bunch.
+        resHandling(response, false);
+      }else{
+        window.alert(`Invalid result from ChatGPT`);
+        throw 'Invalid Result';
+      }
     }
   }
 
   // generates songs from chatgpt
   async function generateSongs(reprompting: boolean) {
-      // return if no text
-      if (!text || !text.trim()) {
-        window.alert('Please enter some text.');
-        return;
-      }
+    // return if no text
+    if (!text || !text.trim()) {
+      window.alert('Please enter some text.');
+      return;
+    }
 
     // update loading state
     if (loading) return;
@@ -294,17 +296,43 @@ export default function Home() {
       return;
     }
 
-    // make request to chatgpt
-    const response = await fetch("/api/openai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ texts: newText, mode: "suggest" })
-    });
+    try{
+      // make request to chatgpt
+      const response = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ texts: newText, mode: "suggest" })
+      });
 
-    // handles the response and allows ChatGPT to reprompt itself once
-    resHandling(response, true);
+      // handles the response and allows ChatGPT to reprompt itself once
+      await resHandling(response, true);
+    }catch(error: any) {
+      if(error=="Invalid Result"){
+        try { // to get GPT3 to return a response in the correct format
+          setLoading(true);
+
+          // If all else fails, try it with GPT3.
+          const response = await fetch("/api/openai", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ texts: newText, mode: "gpt3" })
+          });
+
+          // This time, it can be true without breaking everything
+          await resHandling(response, false);
+        } catch (err: any){
+          handleErrorUI();
+          throw err; 
+        }
+      }else{
+        handleErrorUI();
+        throw error;
+      }
+    }
   }
 
   async function loadBox() {

@@ -16,16 +16,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     return;
   }
+
+  // handling errors are currently the same for every mode
+  function handleErrors(error: any) {
+    // Consider adjusting the error handling logic for your use case
+    if (error.response) {
+      console.error(error.response.status, error.response.data);
+      res.status(error.response.status).json(error.response.data);
+    } else {
+      console.error(`Error with OpenAI API request: ${error.message}`);
+      res.status(500).json({
+        error: {
+          message: 'An error occurred during your request.',
+        }
+      });
+    }
+  }
   
+  if(req.body.mode == "gpt3") {
+    const prompt = getGPT3Prompt();
+    const text = req.body.texts.join(' ');
+  
+    try {
+      const completion = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `${prompt}${text} -> `,
+        temperature: .7,
+        max_tokens: 256
+      });
+      res.status(200).json({ result: completion.data.choices[0].text });
+    } catch (error: any) {
+      handleErrors(error);
+      return;
+    }
+  }
+
   let prompt = "";
   if(req.body.mode == "suggest") {
     prompt = getPrompt();
   }
   if(req.body.mode == "fix prompt") {
     prompt = getFixingPromptPrompt();
-  }
-  if(req.body.mode == "gpt3") {
-    prompt = getGPT3Prompt();
   }
 
   const chatHistory = req.body.texts.map((message: string) => {
@@ -51,17 +82,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw 'completion.data.choices[0].message is undefined'
     }
   } catch (error: any) {
-    // Consider adjusting the error handling logic for your use case
-    if (error.response) {
-      console.error(error.response.status, error.response.data);
-      res.status(error.response.status).json(error.response.data);
-    } else {
-      console.error(`Error with OpenAI API request: ${error.message}`);
-      res.status(500).json({
-        error: {
-          message: 'An error occurred during your request.',
-        }
-      });
-    }
+    handleErrors(error);
   }
 }
