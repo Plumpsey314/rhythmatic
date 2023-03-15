@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
-import { getPrompt } from '@/util/prompt';
+import { getFixingPromptPrompt, getGPT3Prompt, getPrompt } from '@/util/prompt';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -17,7 +17,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
 
-  const prompt = getPrompt();
+  // handling errors are currently the same for every mode
+  function handleErrors(error: any) {
+    // Consider adjusting the error handling logic for your use case
+    if (error.response) {
+      console.error(error.response.status, error.response.data);
+      res.status(error.response.status).json(error.response.data);
+    } else {
+      console.error(`Error with OpenAI API request: ${error.message}`);
+      res.status(500).json({
+        error: {
+          message: 'An error occurred during your request.',
+        }
+      });
+    }
+  }
+  
+  if(req.body.mode == "gpt3") {
+    const prompt = getGPT3Prompt();
+    const text = req.body.texts.join(' ');
+  
+    try {
+      const completion = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: `${prompt}${text} -> `,
+        temperature: .7,
+        max_tokens: 256
+      });
+      res.status(200).json({ result: completion.data.choices[0].text });
+    } catch (error: any) {
+      handleErrors(error);
+      return;
+    }
+  }
+
+  let prompt = "";
+  if(req.body.mode == "suggest") {
+    prompt = getPrompt();
+  }
+  if(req.body.mode == "fix prompt") {
+    prompt = getFixingPromptPrompt();
+  }
 
   const chatHistory = req.body.texts.map((message: string) => {
     return {"role": "user", "content": `${message}`}
@@ -25,6 +65,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const messages = [{"role": "system", "content": `${prompt}`}, ...chatHistory];
 
+  if(prompt==""){
+    throw "Could not load the prompt to give to ChatGPT"
+  }
 
   try {
     const completion = await openai.createChatCompletion({
@@ -39,17 +82,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw 'completion.data.choices[0].message is undefined'
     }
   } catch (error: any) {
-    // Consider adjusting the error handling logic for your use case
-    if (error.response) {
-      console.error(error.response.status, error.response.data);
-      res.status(error.response.status).json(error.response.data);
-    } else {
-      console.error(`Error with OpenAI API request: ${error.message}`);
-      res.status(500).json({
-        error: {
-          message: 'An error occurred during your request.',
-        }
-      });
-    }
+    handleErrors(error);
   }
 }

@@ -112,12 +112,92 @@ export default function Home() {
     location.reload();
   }
 
+  // A function that handles the errors/next steps after making a request to openAI
+  // Note: This function does not directly make any request to OpenAI, but it just deals with how to hande the response.
+  async function resHandling(res: any, canRecurse: boolean){
+    // parse json data
+    if (res.status !== 200) {
+      setLoading(false);
+      if (res.status === 504) {
+        throw 'OpenAI request timed out';
+      }
+      else {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+    }
+    const data = await res.json();
+
+    // parse raw result
+    let raw = data.result.trim();
+
+    // keeping this commented out line for development ease
+    // window.alert(raw);
+
+    // parse song array
+    let songArray: string[];
+
+    const bracketIndex = raw.indexOf('[');
+    if (bracketIndex === -1) {
+      // Try to make it work if formated incorectly
+      let keepGoing: boolean = true;
+      let songNumber: number = 1;
+      let tempRaw: string = raw;
+      songArray = [];
+      while(keepGoing&&songNumber<=10){
+        if(tempRaw.includes(songNumber+".")||tempRaw.includes("1.")){
+          if(tempRaw.includes((songNumber+1)+".")){
+            songArray.push(tempRaw.substring(2, tempRaw.indexOf((songNumber+1)+".")).trim());
+          }else{
+            if(tempRaw.includes("1.")){
+              songArray.push(tempRaw.substring(2, tempRaw.indexOf("1.")).trim());
+              songNumber = 1;
+            }else{
+              songArray.push(tempRaw.substring((songNumber==10?3:2)).trim());
+              keepGoing=false;
+            }
+          }
+          songNumber++;
+          tempRaw=tempRaw.substring(tempRaw.indexOf((songNumber)+"."));
+        }else{
+          keepGoing=false;
+        }   
+      }
+      // What to do if it does not work
+      if(songArray.length==0){
+        setLoading(false);
+        throw 'Invalid Result';
+      }
+    }else{
+      raw = raw.substring(bracketIndex);
+      try {
+        songArray = JSON.parse(raw);
+      } catch (e) {
+        setLoading(false);
+        throw `Something went wrong parsing the result: ${e}`;
+      }
+    }
+
+    setLastResponse(raw);
+
+    // get tracks from song data We are not fixing the prompt again. That will set up an infinite recursive loop
+    getTracks(songArray, canRecurse);
+  }
+
+  // collects an email and saves it to localstorage and firebase
+  async function collectEmail() {
+    localStorage.setItem('email', email);
+    setPopupOpen(false);
+    const emailsRef = collection(db, 'emails');
+    await addDoc(emailsRef, { email, timestamp: new Date().getTime() });
+  }
+
   // gets data for given tracks
-  async function getTracks(tracksData: string[]) {
+  async function getTracks(tracksData: string[], fixingPrompt: boolean) {
     setLoading(false);
     setTracks([]);
     let index: number = 0;
     let allTracks: any[] = [];
+    let anything: boolean = false;
     async function makeRequest(tracksData: string[]) {
       if (index === tracksData.length) {
         setTracks(allTracks);
@@ -140,9 +220,11 @@ export default function Home() {
         const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
         // handle api error
         if (response.status !== 200) {
-          window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
+          // Commenting this line out since it sometimes alerts user because of one song despite having other perfectly good songs
+          // window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
           return;
         }
+        anything = true;
         const data = await response.json();
         const track = data?.tracks?.items[0];
         if (track) {
@@ -153,24 +235,36 @@ export default function Home() {
       index++;
       makeRequest(tracksData);
     }
-    makeRequest(tracksData);
-  }
+    await makeRequest(tracksData);
 
-  // collects an email and saves it to localstorage and firebase
-  async function collectEmail() {
-    localStorage.setItem('email', email);
-    setPopupOpen(false);
-    const emailsRef = collection(db, 'emails');
-    await addDoc(emailsRef, { email, timestamp: new Date().getTime() });
+    if(!anything){
+      if(fixingPrompt){
+        setLoading(true);
+
+        // make request to chatgpt
+        const response = await fetch("/api/openai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ texts: ["[" + tracksData.toString() + "]"], mode: "fix prompt" })
+        });
+  
+        // NEVER change this to true. It can create an infinite loop and charge us a bunch.
+        resHandling(response, false);
+      }else{
+        throw 'Invalid Result';
+      }
+    }
   }
 
   // generates songs from chatgpt
   async function generateSongs(reprompting: boolean) {
-      // return if no text
-      if (!text || !text.trim()) {
-        window.alert('Please enter some text.');
-        return;
-      }
+    // return if no text
+    if (!text || !text.trim()) {
+      window.alert('Please enter some text.');
+      return;
+    }
 
     // update loading state
     if (loading) return;
@@ -206,77 +300,45 @@ export default function Home() {
       return;
     }
 
-    // make request to chatgpt
-    const response = await fetch("/api/openai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ texts: newText })
-    });
+    try{
+      // make request to chatgpt
+      const response = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ texts: newText, mode: "suggest" })
+      });
 
-    // parse json data
-    if (response.status !== 200) {
-      setLoading(false);
-      if (response.status === 504) {
-        window.alert('Error: OpenAI did not return a response in time');
+      // handles the response and allows ChatGPT to reprompt itself once
+      await resHandling(response, true);
+    }catch(error: any) {
+      if(error=="Invalid Result"){
+        try { // to get GPT3 to return a response in the correct format
+          setLoading(true);
+
+          // If all else fails, try it with GPT3.
+          const response = await fetch("/api/openai", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ texts: newText, mode: "gpt3" })
+          });
+
+          // This time, it can be true without breaking everything
+          await resHandling(response, false);
+        } catch (err: any){
+          handleErrorUI();
+          window.alert(err);
+          throw err; 
+        }
+      }else{
         handleErrorUI();
-        throw 'OpenAI request timed out';
-      }
-      else {
-        handleErrorUI();
-        throw new Error(`Request failed with status ${response.status}`);
+        window.alert(error);
+        throw error;
       }
     }
-    const data = await response.json();
-
-    // parse raw result
-    let raw = data.result.trim();
-
-    // parse song array
-    let songArray: string[];
-
-    const bracketIndex = raw.indexOf('[');
-    if (bracketIndex === -1) {
-      // Try to make it work
-      let keepGoing: boolean = true;
-      let songNumber: number = 1;
-      songArray = [];
-      while(keepGoing&&songNumber<=10){
-        if(raw.includes(songNumber+".")){
-          if(raw.includes((songNumber+1)+".")){
-            songArray.push(raw.substring(raw.indexOf(songNumber+".")+2, raw.indexOf((songNumber+1)+".")).trim());
-          }else{
-            songArray.push(raw.substring(raw.indexOf(songNumber+".")+(songNumber==10?3:2)).trim());
-          }
-          songNumber++;
-        }else{
-          keepGoing=false;
-        }   
-      }
-      // What to do if it does not work
-      if(songArray.length==0){
-        setLoading(false);
-        handleErrorUI();
-        // window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
-        window.alert(`Invalid result from ChatGPT`);
-        throw 'invalid result';
-      }
-    }else{
-      raw = raw.substring(bracketIndex);
-      try {
-        songArray = JSON.parse(raw);
-      } catch (e) {
-        setLoading(false);
-        handleErrorUI();
-        throw `Something went wrong parsing the result: ${e}`;
-      }
-    }
-
-    setLastResponse(raw);
-
-    // get tracks from song data
-    getTracks(songArray);
   }
 
   async function loadBox() {
@@ -421,25 +483,25 @@ export default function Home() {
         let count = -50;
         blueLoading.current.style.borderRadius = '8px';
 
-        // To catch when ChatGPT returns no songs (but no other error occurs)
-        let noTracksCount = 0;
-        let definatelyTracks = false;
+        // // To catch when ChatGPT returns no songs (but no other error occurs)
+        // let noTracksCount = 0;
+        // let definatelyTracks = false;
         const fadeBack = setInterval(() => {
-          // Tracks might not imidiately load, so something like if(!songTrack.current)window.alert would not work.
-          if(!definatelyTracks){
-            if(songTrack.current){
-              definatelyTracks = true;
-            }else{
-              // Wait two seconds for track to load just to be safe (sometimes it takes 200 ms).
-              if(noTracksCount>1000){
-                clearInterval(fadeBack);
-                window.alert('Sorry: no songs met that request');
-                location.reload();
-                return;
-              }
-              noTracksCount++;
-            }
-          }
+          // // Tracks might not imidiately load, so something like if(!songTrack.current)window.alert would not work.
+          // if(!definatelyTracks){
+          //   if(songTrack.current){
+          //     definatelyTracks = true;
+          //   }else{
+          //     // Wait two seconds for track to load just to be safe (sometimes it takes 200 ms).
+          //     if(noTracksCount>1000){
+          //       clearInterval(fadeBack);
+          //       window.alert('Sorry: no songs met that request');
+          //       location.reload();
+          //       return;
+          //     }
+          //     noTracksCount++;
+          //   }
+          // }
           if (blueLoading.current && blackBackground.current && songTrack.current) {
 
             if (count <= 0) {
