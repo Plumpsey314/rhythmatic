@@ -130,6 +130,7 @@ export default function Home() {
     // parse raw result
     let raw = data.result.trim();
 
+    // keeping this commented out line for development ease
     // window.alert(raw);
 
     // parse song array
@@ -140,15 +141,23 @@ export default function Home() {
       // Try to make it work if formated incorectly
       let keepGoing: boolean = true;
       let songNumber: number = 1;
+      let tempRaw: string = raw;
       songArray = [];
       while(keepGoing&&songNumber<=10){
-        if(raw.includes(songNumber+".")){
-          if(raw.includes((songNumber+1)+".")){
-            songArray.push(raw.substring(raw.indexOf(songNumber+".")+2, raw.indexOf((songNumber+1)+".")).trim());
+        if(tempRaw.includes(songNumber+".")||tempRaw.includes("1.")){
+          if(tempRaw.includes((songNumber+1)+".")){
+            songArray.push(tempRaw.substring(2, tempRaw.indexOf((songNumber+1)+".")).trim());
           }else{
-            songArray.push(raw.substring(raw.indexOf(songNumber+".")+(songNumber==10?3:2)).trim());
+            if(tempRaw.includes("1.")){
+              songArray.push(tempRaw.substring(2, tempRaw.indexOf("1.")).trim());
+              songNumber = 1;
+            }else{
+              songArray.push(tempRaw.substring((songNumber==10?3:2)).trim());
+              keepGoing=false;
+            }
           }
           songNumber++;
+          tempRaw=tempRaw.substring(tempRaw.indexOf((songNumber)+"."));
         }else{
           keepGoing=false;
         }   
