@@ -119,7 +119,6 @@ export default function Home() {
     if (res.status !== 200) {
       setLoading(false);
       if (res.status === 504) {
-        window.alert('Error: OpenAI did not return a response in time');
         throw 'OpenAI request timed out';
       }
       else {
@@ -131,7 +130,7 @@ export default function Home() {
     // parse raw result
     let raw = data.result.trim();
 
-    window.alert(raw);
+    // window.alert(raw);
 
     // parse song array
     let songArray: string[];
@@ -157,8 +156,6 @@ export default function Home() {
       // What to do if it does not work
       if(songArray.length==0){
         setLoading(false);
-        // window.alert(`Invalid result from ChatGPT:\n${raw ? raw : 'No response'}`);
-        window.alert(`Invalid result from ChatGPT`);
         throw 'Invalid Result';
       }
     }else{
@@ -225,7 +222,6 @@ export default function Home() {
           setTracks(tracks => tracks ? [...tracks, track] : [track]);
           allTracks.push(track);
         }
-        console.log(anything);
       }
       index++;
       makeRequest(tracksData);
@@ -248,7 +244,6 @@ export default function Home() {
         // NEVER change this to true. It can create an infinite loop and charge us a bunch.
         resHandling(response, false);
       }else{
-        window.alert(`Invalid result from ChatGPT`);
         throw 'Invalid Result';
       }
     }
@@ -326,10 +321,12 @@ export default function Home() {
           await resHandling(response, false);
         } catch (err: any){
           handleErrorUI();
+          window.alert(err);
           throw err; 
         }
       }else{
         handleErrorUI();
+        window.alert(error);
         throw error;
       }
     }
