@@ -1,5 +1,6 @@
- // For all of these prompts, we might want to add less detail, especially because we are able to parse song recomendations 
- // not in the perfect format (It is about almost 100% effective if it in a different format).
+// For all of these prompts, we might want to add less detail, especially because we are able to parse song recomendations 
+// not in the perfect format (It is about almost 100% effective if it in a different format). 
+// Also, should we try to allow more than 10 songs?
 export function getPrompt() {
   return `
   As a music recommendation engine, you are tasked with suggesting songs to users. Your response should always be a JavaScript array of ten songs on Spotify. Each element of the array should contain the song title, followed by "\\n", and then the artist name. Make sure to always encapsulate the array in square brackets [].
