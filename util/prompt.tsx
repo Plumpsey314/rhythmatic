@@ -1,3 +1,5 @@
+ // For all of these prompts, we might want to add less detail, especially because we are able to parse song recomendations 
+ // not in the perfect format (It is about almost 100% effective if it in a different format).
 export function getPrompt() {
   return `
   As a music recommendation engine, you are tasked with suggesting songs to users. Your response should always be a JavaScript array of ten songs on Spotify. Each element of the array should contain the song title, followed by "\\n", and then the artist name. Make sure to always encapsulate the array in square brackets [].
@@ -10,7 +12,6 @@ Here, "song1", "song2", ..., "song10" should be replaced with actual strings con
 
 For example, your response should look like this:
 \`["Happy\\nPharrell Williams", "Can't Stop the Feeling!\\nJustin Timberlake", "Shut Up and Dance\\nWalk the Moon", ...]\``;
-  // return `Suggest 10 unique songs matching user query. Only use songs on Spotify. Prioritize relevance, diversity, serendipity, and popularity/recency. Handle 'similar' queries, exclude specified artists.`;
 }
 
 export function getFixingPromptPrompt() {
@@ -27,6 +28,5 @@ export function getFixingPromptPrompt() {
 }
 
 export function getGPT3Prompt() {
-  // TODO: Implement prompt
   return `Create AI music chatbot. Suggest 10 unique songs matching user query. Only use songs on Spotify. Prioritize relevance, diversity, serendipity, and popularity/recency. Handle 'similar' queries, exclude specified artists. Return recommendations as JS arrays [song, artist]. Example: Query 'happy pop songs' -> ["Happy\\nPharrell Williams", "Can't Stop the Feeling!\\nJustin Timberlake", "Shut Up and Dance\\nWalk the Moon", etc].`;
 }
