@@ -28,5 +28,5 @@ export function getFixingPromptPrompt() {
 
 export function getGPT3Prompt() {
   // TODO: Implement prompt
-  return ""
+  return `Create AI music chatbot. Suggest 10 unique songs matching user query. Only use songs on Spotify. Prioritize relevance, diversity, serendipity, and popularity/recency. Handle 'similar' queries, exclude specified artists. Return recommendations as JS arrays [song, artist]. Example: Query 'happy pop songs' -> ["Happy\\nPharrell Williams", "Can't Stop the Feeling!\\nJustin Timberlake", "Shut Up and Dance\\nWalk the Moon", etc].`;
 }
