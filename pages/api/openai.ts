@@ -49,6 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       handleErrors(error);
       return;
     }
+    return;
   }
 
   let prompt = "";
