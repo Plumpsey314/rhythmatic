@@ -122,6 +122,10 @@
       overflow: hidden;
     }
 
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
     >.loading {
       position: absolute;
       top: 240px;
