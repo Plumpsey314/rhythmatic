@@ -21,6 +21,8 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [haveBeen, setHaveBeen] = useState<boolean>(false);
   const [anyTracks, setAnyTracks] = useState<boolean>(tracks ? tracks.length > 0 ? true : false : false);
+  // TODO: COOPER replace this with functional link
+  const [signedIn, setSignedIn] = useState<boolean>(false);
 
   const blueLoading = useRef<HTMLDivElement>(null);
   const blackBackground = useRef<HTMLDivElement>(null);
@@ -584,15 +586,29 @@ export default function Home() {
         />
         <h1>Rhythmatic</h1>
       </div>
+      {/* This should kind of merge with the commented out code when we connect with spotufy. */}
+      <div className={styles.spotifyContainer}>
+        <Image
+              src="/img/spotify_logo.png"
+              width="112"
+              height="32"
+              alt="spotify_logo.png"
+        />
+        {
+          signedIn? <button className={styles.accountButton} onClick={() => setSignedIn(false)}> Sign Out of Spotify </button> 
+            : <button className={styles.accountButton} onClick={() => setSignedIn(true)}> Sign In to Spotify </button>
+        }
+        <a href={"https://accounts.spotify.com"}>{signedIn?"OPEN SPOTIFY":"GET SPOTIFY FREE"}</a>
+      </div>
       {/*
         !session ?
           <button className={styles.signInButton} onClick={() => signIn('spotify')}>
             Sign in with
             <Image
-              src="/img/spotify.png"
+              src="/img/spotify_icon.png"
               width="36"
               height="36"
-              alt="spotify.png"
+              alt="spotify_icon.png"
             />
           </button> :
           <button className={styles.signOutButton} onClick={() => signOut()}>

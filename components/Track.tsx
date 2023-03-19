@@ -104,6 +104,13 @@ export default function Track(props: Props) {
               alt="pause.svg"
             />
         }
+        <Image
+          className={styles.trackIcon}
+          src="/img/spotify_icon.png"
+          width="12"
+          height="12"
+          alt="spotify_icon.png"
+        />
       </button>
       <ThemeProvider theme={theme}>
         <div className={styles.save}>

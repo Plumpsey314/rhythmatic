@@ -58,10 +58,6 @@
     justify-content: center;
     z-index: 5;
 
-    @media (max-width: 513.98px) {
-      display: none;
-    }
-
     >img {
       margin-right: 4px;
     }
@@ -73,61 +69,62 @@
     }
   }
 
-  .signInButton {
+  .spotifyContainer {
     position: absolute;
-    padding: 0 16px;
-    height: 56px;
     top: 24px;
     right: 24px;
-    background: #111;
-    border: 1px solid #444;
-    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 5;
-
-    >img {
-      margin-left: 12px;
-    }
-
-    &:hover {
-      background: #171717;
-    }
-  }
-
-  .signOutButton {
-    position: absolute;
-    width: 152px;
-    height: 56px;
-    top: 24px;
-    right: 24px;
-    background: #111;
-    border: 1px solid #444444;
-    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
-    border-radius: 8px;
+    flex-direction: column;
     color: #fff;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 5;
 
-    >img {
-      margin-right: 8px;
+    img {
+      @media(max-width: 1124.98px) {
+        position: absolute;
+        right: 12px;
+        top: 0px;
+        margin-top: 12px;
+      }
     }
 
-    &:hover {
-      background: #171717;
+    .accountButton {
+      width: 225px;
+      font-size: 24px;
+      background: #111;
+      color: #fff;
+      margin: 16px 8px 10px;
+      border: 1px solid #444;
+      box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      padding: 0 16px;
+      
+      &:hover {
+        background: #171717;
+      }
+
+      @media(max-width: 1124.98px) {
+        margin-top: 60px !important;
+      }
+
+      @media(max-width: 1124.98px) {
+        right: 8px;
+      }      
     }
   }
 
   .content {
     height: 100%;
     overflow: auto;
+
+    @media (max-width: 1124.98px) {
+      overflow: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
 
     >.loading {
       position: absolute;
@@ -272,8 +269,8 @@
           top: 24px;
           z-index: 10;
 
-          @media (max-width: 1199.98px) {
-            top: 104px;
+          @media (max-width: 1124.98px) {
+            top: 160px;
           }
         }
 
@@ -321,13 +318,13 @@
     .tracks {
       flex-direction: column;
       align-items: center;
-      overflow: auto;
       display: flex;
-      margin: 120px 0 40px 0;
-      overflow: hidden;
+      margin: 120px 0 20px 0;
 
-      @media (max-width: 1199.98px) {
-        margin-top: 180px;
+      @media (max-width: 1124.98px) {
+        margin-top: 215px;
+        overflow: auto;
+        height: calc(100vh - 200px);
       }
     }
   }
