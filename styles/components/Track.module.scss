@@ -37,6 +37,10 @@
       overflow: hidden;
       white-space: nowrap;
       max-width: 100%;
+
+      @media (max-width: 550px) {
+        font-size: medium;
+      }
     }
 
     >p {
