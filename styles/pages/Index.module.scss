@@ -324,7 +324,7 @@
       @media (max-width: 1199.98px) {
         margin-top: 215px;
         overflow: auto;
-        max-height: 550px;
+        height: calc(100vh - 200px);
       }
     }
   }
