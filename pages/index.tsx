@@ -594,11 +594,13 @@ export default function Home() {
               height="32"
               alt="spotify_logo.png"
         />
-        {
+        {/* {
           signedIn? <button className={styles.accountButton} onClick={() => setSignedIn(false)}> Sign Out of Spotify </button> 
             : <button className={styles.accountButton} onClick={() => setSignedIn(true)}> Sign In to Spotify </button>
         }
-        <a href={"https://accounts.spotify.com"}>{signedIn?"OPEN SPOTIFY":"GET SPOTIFY FREE"}</a>
+        <a href={"https://accounts.spotify.com"}>{signedIn?"OPEN SPOTIFY":"GET SPOTIFY FREE"}</a> */}
+        <a href={"https://accounts.spotify.com"}>{"OPEN SPOTIFY"}</a>
+
       </div>
       {/*
         !session ?
