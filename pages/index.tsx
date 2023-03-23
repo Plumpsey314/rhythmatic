@@ -599,7 +599,7 @@ export default function Home() {
             : <button className={styles.accountButton} onClick={() => setSignedIn(true)}> Sign In to Spotify </button>
         }
         <a href={"https://accounts.spotify.com"}>{signedIn?"OPEN SPOTIFY":"GET SPOTIFY FREE"}</a> */}
-        <a href={"https://accounts.spotify.com"}>{"OPEN SPOTIFY"}</a>
+        <a className={styles.spotifyLink} href={"https://accounts.spotify.com"}>{"OPEN SPOTIFY"}</a>
 
       </div>
       {/*

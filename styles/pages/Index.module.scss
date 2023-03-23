@@ -89,28 +89,36 @@
       }
     }
 
-    .accountButton {
-      width: 225px;
-      font-size: 24px;
-      background: #111;
-      color: #fff;
-      margin: 16px 8px 10px;
-      border: 1px solid #444;
-      box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
-      border-radius: 8px;
-      padding: 0 16px;
+    /* Not used currently: */
+    // .accountButton {
+    //   width: 225px;
+    //   font-size: 24px;
+    //   background: #111;
+    //   color: #fff;
+    //   margin: 16px 8px 10px;
+    //   border: 1px solid #444;
+    //   box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
+    //   border-radius: 8px;
+    //   padding: 0 16px;
       
-      &:hover {
-        background: #171717;
-      }
+    //   &:hover {
+    //     background: #171717;
+    //   }
 
-      @media(max-width: 1124.98px) {
-        margin-top: 60px !important;
-      }
+    //   @media(max-width: 1124.98px) {
+    //     margin-top: 60px !important;
+    //   }
 
+    //   @media(max-width: 1124.98px) {
+    //     right: 8px;
+    //   }      
+    // }
+
+    .spotifyLink {
       @media(max-width: 1124.98px) {
-        right: 8px;
-      }      
+        margin-top: 45px;
+        margin-right: 12px;
+      }
     }
   }
 
@@ -270,7 +278,7 @@
           z-index: 10;
 
           @media (max-width: 1124.98px) {
-            top: 160px;
+            top: 90px;
           }
         }
 
@@ -322,9 +330,9 @@
       margin: 120px 0 20px 0;
 
       @media (max-width: 1124.98px) {
-        margin-top: 215px;
+        margin-top: 150px;
         overflow: auto;
-        height: calc(100vh - 200px);
+        height: calc(100vh - 150px);
       }
     }
   }
