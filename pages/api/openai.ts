@@ -1,6 +1,6 @@
+import { getFixingPromptPrompt, getGPT3Prompt, getPrompt } from '@/util/prompt';
 import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
-import { getFixingPromptPrompt, getGPT3Prompt, getPrompt } from '@/util/prompt';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -32,11 +32,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
   }
-  
-  if(req.body.mode == "gpt3") {
+
+  if (req.body.mode == "gpt3") {
     const prompt = getGPT3Prompt();
     const text = req.body.texts.join(' ');
-  
+
     try {
       const completion = await openai.createCompletion({
         model: "text-davinci-003",
@@ -53,20 +53,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   let prompt = "";
-  if(req.body.mode == "suggest") {
+  if (req.body.mode == "suggest") {
     prompt = getPrompt();
   }
-  if(req.body.mode == "fix prompt") {
+  if (req.body.mode == "fix prompt") {
     prompt = getFixingPromptPrompt();
   }
 
   const chatHistory = req.body.texts.map((message: string) => {
-    return {"role": "user", "content": `${message}`}
+    return { "role": "user", "content": `${message}` }
   })
 
-  const messages = [{"role": "system", "content": `${prompt}`}, ...chatHistory];
+  const messages = [{ "role": "system", "content": `${prompt}` }, ...chatHistory];
 
-  if(prompt==""){
+  if (prompt == "") {
     throw "Could not load the prompt to give to ChatGPT"
   }
 
@@ -77,9 +77,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       temperature: 0.7,
       max_tokens: 256
     });
-    if(completion.data.choices[0].message){
+    if (completion.data.choices[0].message) {
       res.status(200).json({ result: completion.data.choices[0].message.content });
-    }else{
+    } else {
       throw 'completion.data.choices[0].message is undefined'
     }
   } catch (error: any) {
