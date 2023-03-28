@@ -61,7 +61,7 @@ export default function Home() {
     if (textForm.current) {
       maxChars = (textForm.current.offsetWidth - 112) * 0.075;
     }
-    if(!anyTracks){
+    if (!anyTracks) {
       maxChars += 2;
     }
     const textInterval = setInterval(() => {
@@ -79,9 +79,9 @@ export default function Home() {
       if (stateIndex === states.length) stateIndex = 0;
       if (countdown === 0) {
         const minIndex = Math.max(0, letterIndex - maxChars);
-        if (minIndex > 0) {
-          countdown = 1;
-        }
+        // if (minIndex > 0) {
+        //   countdown = 1;
+        // }
         setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
         letterIndex++;
       } else countdown--;
@@ -116,7 +116,7 @@ export default function Home() {
 
   // A function that handles the errors/next steps after making a request to openAI
   // Note: This function does not directly make any request to OpenAI, but it just deals with how to hande the response.
-  async function resHandling(res: any, canRecurse: boolean){
+  async function resHandling(res: any, canRecurse: boolean) {
     // parse json data
     if (res.status !== 200) {
       setLoading(false);
@@ -145,31 +145,31 @@ export default function Home() {
       let songNumber: number = 1;
       let tempRaw: string = raw;
       songArray = [];
-      while(keepGoing&&songNumber<=10){
-        if(tempRaw.includes(songNumber+".")||tempRaw.includes("1.")){
-          if(tempRaw.includes((songNumber+1)+".")){
-            songArray.push(tempRaw.substring(2, tempRaw.indexOf((songNumber+1)+".")).trim());
-          }else{
-            if(tempRaw.includes("1.")){
+      while (keepGoing && songNumber <= 10) {
+        if (tempRaw.includes(songNumber + ".") || tempRaw.includes("1.")) {
+          if (tempRaw.includes((songNumber + 1) + ".")) {
+            songArray.push(tempRaw.substring(2, tempRaw.indexOf((songNumber + 1) + ".")).trim());
+          } else {
+            if (tempRaw.includes("1.")) {
               songArray.push(tempRaw.substring(2, tempRaw.indexOf("1.")).trim());
               songNumber = 1;
-            }else{
-              songArray.push(tempRaw.substring((songNumber==10?3:2)).trim());
-              keepGoing=false;
+            } else {
+              songArray.push(tempRaw.substring((songNumber == 10 ? 3 : 2)).trim());
+              keepGoing = false;
             }
           }
           songNumber++;
-          tempRaw=tempRaw.substring(tempRaw.indexOf((songNumber)+"."));
-        }else{
-          keepGoing=false;
-        }   
+          tempRaw = tempRaw.substring(tempRaw.indexOf((songNumber) + "."));
+        } else {
+          keepGoing = false;
+        }
       }
       // What to do if it does not work
-      if(songArray.length==0){
+      if (songArray.length == 0) {
         setLoading(false);
         throw 'Invalid Result';
       }
-    }else{
+    } else {
       raw = raw.substring(bracketIndex);
       try {
         songArray = JSON.parse(raw);
@@ -209,16 +209,16 @@ export default function Home() {
       let trackData = tracksData[index].split('"').join('');
       // songs should be split by \n but if chatGPT might occasionally split it by something else.
       let [song, artist] = trackData.split('\n');
-      if(!artist){
+      if (!artist) {
         [song, artist] = trackData.split('\\n');
-        if(!artist){
+        if (!artist) {
           [song, artist] = trackData.split(' by ');
-          if(!artist){
+          if (!artist) {
             [song, artist] = trackData.split(' - ');
           }
         }
       }
-      if(artist){
+      if (artist) {
         const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
         // handle api error
         if (response.status !== 200) {
@@ -239,8 +239,8 @@ export default function Home() {
     }
     await makeRequest(tracksData);
 
-    if(!anything){
-      if(fixingPrompt){
+    if (!anything) {
+      if (fixingPrompt) {
         setLoading(true);
 
         // make request to chatgpt
@@ -251,10 +251,10 @@ export default function Home() {
           },
           body: JSON.stringify({ texts: ["[" + tracksData.toString() + "]"], mode: "fix prompt" })
         });
-  
+
         // NEVER change this to true. It can create an infinite loop and charge us a bunch.
         resHandling(response, false);
-      }else{
+      } else {
         throw 'Invalid Result';
       }
     }
@@ -286,7 +286,7 @@ export default function Home() {
     loadBox();
 
     // set new text as message history when reprompting, or the origional message when not reprompting
-    const newText = reprompting?[...messages, text]:[text];
+    const newText = reprompting ? [...messages, text] : [text];
 
     let totalLength = 0;
     newText.forEach(text => {
@@ -302,7 +302,7 @@ export default function Home() {
       return;
     }
 
-    try{
+    try {
       // make request to chatgpt
       const response = await fetch("/api/openai", {
         method: "POST",
@@ -314,8 +314,8 @@ export default function Home() {
 
       // handles the response and allows ChatGPT to reprompt itself once
       await resHandling(response, true);
-    }catch(error: any) {
-      if(error=="Invalid Result"){
+    } catch (error: any) {
+      if (error == "Invalid Result") {
         try { // to get GPT3 to return a response in the correct format
           setLoading(true);
 
@@ -330,12 +330,12 @@ export default function Home() {
 
           // This time, it can be true without breaking everything
           await resHandling(response, false);
-        } catch (err: any){
+        } catch (err: any) {
           handleErrorUI();
           window.alert(err);
-          throw err; 
+          throw err;
         }
-      }else{
+      } else {
         handleErrorUI();
         window.alert(error);
         throw error;
@@ -589,10 +589,10 @@ export default function Home() {
       {/* This should kind of merge with the commented out code when we connect with spotufy. */}
       <div className={styles.spotifyContainer}>
         <Image
-              src="/img/spotify_logo.png"
-              width="112"
-              height="32"
-              alt="spotify_logo.png"
+          src="/img/spotify_logo.png"
+          width="112"
+          height="32"
+          alt="spotify_logo.png"
         />
         {/* {
           signedIn? <button className={styles.accountButton} onClick={() => setSignedIn(false)}> Sign Out of Spotify </button> 
