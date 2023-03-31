@@ -588,18 +588,21 @@ export default function Home() {
       </div>
       {/* This should kind of merge with the commented out code when we connect with spotufy. */}
       <div className={styles.spotifyContainer}>
-        <Image
+        {/* <Image
           src="/img/spotify_logo.png"
           width="112"
           height="32"
           alt="spotify_logo.png"
-        />
+        /> */}
         {/* {
-          signedIn? <button className={styles.accountButton} onClick={() => setSignedIn(false)}> Sign Out of Spotify </button> 
+          signedIn? <button className={styles.accountButton} onClick={() => setSignedIn(false)}> Sign Out of Spotify </button>
             : <button className={styles.accountButton} onClick={() => setSignedIn(true)}> Sign In to Spotify </button>
         }
         <a href={"https://accounts.spotify.com"}>{signedIn?"OPEN SPOTIFY":"GET SPOTIFY FREE"}</a> */}
-        <a className={styles.spotifyLink} href={"https://accounts.spotify.com"}>{"OPEN SPOTIFY"}</a>
+        {/* <a className={styles.spotifyLink} href={"https://accounts.spotify.com"}>{"OPEN SPOTIFY"}</a> */}
+        <span style={{ maxWidth: '130px', textAlign: 'center' }}>
+          Spotify integration coming soon!
+        </span>
 
       </div>
       {/*
