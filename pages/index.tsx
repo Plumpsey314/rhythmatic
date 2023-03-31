@@ -600,7 +600,7 @@ export default function Home() {
         }
         <a href={"https://accounts.spotify.com"}>{signedIn?"OPEN SPOTIFY":"GET SPOTIFY FREE"}</a> */}
         {/* <a className={styles.spotifyLink} href={"https://accounts.spotify.com"}>{"OPEN SPOTIFY"}</a> */}
-        <span style={{ maxWidth: '130px', textAlign: 'center' }}>
+        <span className={styles.comingSoonText} >
           Spotify integration coming soon!
         </span>
 

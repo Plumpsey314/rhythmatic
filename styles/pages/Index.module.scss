@@ -79,6 +79,10 @@
     flex-direction: column;
     color: #fff;
     z-index: 5;
+    @media(max-width: 499.98px) {
+      top: 36px;
+      right: 8px;
+    }
 
     img {
       @media(max-width: 1124.98px) {
@@ -118,6 +122,14 @@
       @media(max-width: 1124.98px) {
         margin-top: 45px;
         margin-right: 12px;
+      }
+    }
+
+    .comingSoonText {
+      max-width: 130px;
+      text-align: center;
+      @media (max-width: 499.98px) {
+        font-size: 14px;
       }
     }
   }
