@@ -624,7 +624,7 @@ export default function Home() {
           </button>
   */}
       <div className={styles.content}>
-        {
+        {/* {
           popupOpen &&
           <div className={styles.popupContainer}>
             <div className={styles.popup}>
@@ -647,7 +647,7 @@ export default function Home() {
               </form>
             </div>
           </div>
-        }
+        } */}
         <div className={styles.form}>
           <div
             className={(loading || tracks) ? `${styles.formTitle} ${styles.faded}` : styles.formTitle}
