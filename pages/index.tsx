@@ -82,7 +82,10 @@ export default function Home() {
         // if (minIndex > 0) {
         //   countdown = 1;
         // }
-        setTextPlaceholder(states[stateIndex].slice(minIndex, letterIndex + 1));
+        setTextPlaceholder(
+          (minIndex > 0 ? '...' : '') +
+          states[stateIndex].slice(minIndex, letterIndex + 1)
+        );
         letterIndex++;
       } else countdown--;
     }, 80);
