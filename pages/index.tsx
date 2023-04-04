@@ -224,24 +224,29 @@ export default function Home() {
         if (response.status !== 200) {
           // Commenting this line out since it sometimes alerts user because of one song despite having other perfectly good songs
           // window.alert(`Something went wrong searching tracks: ${response.status} ${response.statusText}`);
+          if(response.status == 401){
+            throw '401: Unauthorised accesss'
+          }
           return;
         }
-        anything = true;
         const data = await response.json();
         const track = data?.tracks?.items[0];
         if (track) {
           setTracks(tracks => tracks ? [...tracks, track] : [track]);
           allTracks.push(track);
+          anything = true;
         }
       }
       index++;
-      makeRequest(tracksData);
+      await makeRequest(tracksData);
     }
     await makeRequest(tracksData);
 
     if (!anything) {
       if (fixingPrompt) {
         setLoading(true);
+
+        loadBox();
 
         // make request to chatgpt
         const response = await fetch("/api/openai", {
@@ -255,7 +260,8 @@ export default function Home() {
         // NEVER change this to true. It can create an infinite loop and charge us a bunch.
         resHandling(response, false);
       } else {
-        throw 'Invalid Result';
+        window.alert('Invalid Result');
+        handleErrorUI();
       }
     }
   }
