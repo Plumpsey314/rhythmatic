@@ -345,6 +345,9 @@
         margin-top: 150px;
         overflow: auto;
         height: calc(100vh - 180px);
+        @media (max-width: 499.98px) {
+          padding-bottom: 54px;
+        }
       }
     }
   }
