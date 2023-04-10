@@ -747,6 +747,10 @@ export default function Home() {
                 />
               </button>
             </Tooltip>
+
+            <button className={(loading || !tracks) ? `${styles.generatePlaylist} ${styles.faded}` : styles.generatePlaylist} type="button" onClick={() => { }}>
+              Create Playlist!
+            </button>
           </form>
         </div>
         {
