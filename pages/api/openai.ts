@@ -1,4 +1,4 @@
-import { getFixingPromptPrompt, getGPT3Prompt, getPrompt } from '@/util/prompt';
+import { getFixingPromptPrompt, getGPT3Prompt, getPlaylistPrompt, getPrompt } from '@/util/prompt';
 import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
 
@@ -52,6 +52,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
 
+  let chatHistory = req.body.texts.map((message: string) => {
+    return { "role": "user", "content": `${message}` }
+  })
+
   let prompt = "";
   if (req.body.mode == "suggest") {
     prompt = getPrompt();
@@ -59,10 +63,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.body.mode == "fix prompt") {
     prompt = getFixingPromptPrompt();
   }
-
-  const chatHistory = req.body.texts.map((message: string) => {
-    return { "role": "user", "content": `${message}` }
-  })
+  if (req.body.mode == "playlist") {
+    chatHistory = [];
+    prompt = getPlaylistPrompt(req.body.texts);
+  }
 
   const messages = [{ "role": "system", "content": `${prompt}` }, ...chatHistory];
 

@@ -244,7 +244,7 @@ export default function Home() {
         }
 
         if(recentSongs){
-          if(recentSongs.length >= 30){
+          while(recentSongs.length >= 30){
             // removing the oldest song recommedation
             recentSongs.shift();
           }
@@ -269,8 +269,6 @@ export default function Home() {
     if(recentSongs){
       localStorage.setItem('rhythmaticRecentSongs', recentSongs?.toString());
     }
-
-    console.log(localStorage.getItem('rhythmaticRecentSongs'));
 
     if (!anything) {
       if (fixingPrompt) {
@@ -394,7 +392,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ texts: localStorage.get('rhythmaticRecentSongs'), mode: "playlist" })
+        body: JSON.stringify({ texts: [ localStorage.getItem('rhythmaticRecentSongs') ], mode: "playlist" })
       });
 
       // handles the response and parses it like a result
@@ -802,7 +800,12 @@ export default function Home() {
               </button>
             </Tooltip>
 
-            <button className={(loading || !tracks) ? `${styles.generatePlaylist} ${styles.faded}` : styles.generatePlaylist} type="button" onClick={() => { }}>
+            <button className={loading ? `${styles.generatePlaylist} ${styles.faded}` : styles.generatePlaylist} 
+              type="button"
+              onClick={() => { 
+                generatePlaylist() 
+              }}
+            >
               Create Playlist!
             </button>
           </form>
