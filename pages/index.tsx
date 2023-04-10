@@ -21,6 +21,7 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [haveBeen, setHaveBeen] = useState<boolean>(false);
   const [anyTracks, setAnyTracks] = useState<boolean>(tracks ? tracks.length > 0 ? true : false : false);
+  const [onPlaylist, setOnPlaylist] = useState<boolean>(false);
   // TODO: COOPER replace this with functional link
   const [signedIn, setSignedIn] = useState<boolean>(false);
 
@@ -65,7 +66,7 @@ export default function Home() {
       maxChars += 2;
     }
     const textInterval = setInterval(() => {
-      if (states == promptStates && anyTracks) {
+      if (states == promptStates && anyTracks && !onPlaylist) {
         states = repromptStates;
         stateIndex = 0;
         letterIndex = 0;
@@ -376,8 +377,9 @@ export default function Home() {
   }
 
   async function generatePlaylist() {
-    // update loading state
+    // update states
     setLoading(true);
+    setOnPlaylist(true);
 
     // clear tracks
     setTracks(undefined);
@@ -410,7 +412,7 @@ export default function Home() {
       if (textForm.current) {
         textForm.current.blur();
         textForm.current.style.pointerEvents = 'none';
-        textForm.current.style.paddingRight = '90px';
+        textForm.current.style.paddingRight = onPlaylist ? '52px' : '90px';
       }
       let top = 0;
       let left = 0;
@@ -773,7 +775,7 @@ export default function Home() {
                     }
                   }
                 }}>
-                <button className={loading ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon}
+                <button className={(loading || onPlaylist) ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon}
                   type="button"
                   style={{ right: '50px' }}
                   onClick={() => {
