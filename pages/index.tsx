@@ -387,22 +387,27 @@ export default function Home() {
     // Loading box
     loadBox();
 
-    try {
-      // make request to chatgpt
-      const response = await fetch("/api/openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ texts: [ localStorage.getItem('rhythmaticRecentSongs') ], mode: "playlist" })
-      });
-
-      // handles the response and parses it like a result
-      await resHandling(response, false);
-    } catch (error: any) {
+    if (localStorage.getItem('rhythmaticRecentSongs')) {
+      try {
+        // make request to chatgpt
+        const response = await fetch("/api/openai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ texts: [ localStorage.getItem('rhythmaticRecentSongs') ], mode: "playlist" })
+        });
+  
+        // handles the response and parses it like a result
+        await resHandling(response, false);
+      } catch (error: any) {
+        handleErrorUI();
+        window.alert(error);
+        throw error;
+      }
+    } else {
       handleErrorUI();
-      window.alert(error);
-      throw error;
+      window.alert("Use Rhythmatic before we can generate a playlist for you.");
     }
   }
 
