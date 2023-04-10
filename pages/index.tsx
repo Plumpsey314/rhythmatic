@@ -249,7 +249,7 @@ export default function Home() {
       if (fixingPrompt) {
         setLoading(true);
 
-        loadBox();
+        // loadBox();
 
         // make request to chatgpt
         const response = await fetch("/api/openai", {
