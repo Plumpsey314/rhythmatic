@@ -52,6 +52,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
 
+  let temperature: number = 0.7;
+
   let chatHistory = req.body.texts.map((message: string) => {
     return { "role": "user", "content": `${message}` }
   })
@@ -65,6 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   if (req.body.mode == "playlist") {
     chatHistory = [];
+    temperature = 0.7;
     prompt = getPlaylistPrompt(req.body.texts);
   }
 
@@ -78,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: messages,
-      temperature: 0.7,
+      temperature: temperature,
       max_tokens: 256
     });
     if (completion.data.choices[0].message) {
