@@ -231,7 +231,7 @@ export default function Home() {
           }
         }
       }
-      if (artist) {
+      if (song && artist) {
         const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
         // handle api error
         if (response.status !== 200) {
