@@ -101,6 +101,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if(!localStorage.getItem('rhythmaticRecentSongs')){
+      localStorage.setItem('rhythmaticRecentSongs', '');
+    }
+  }, []);
+
+  useEffect(() => {
     if (anyTracks) {
       if (!tracks) {
         setAnyTracks(false);
@@ -148,7 +154,7 @@ export default function Home() {
       let songNumber: number = 1;
       let tempRaw: string = raw;
       songArray = [];
-      while (keepGoing && songNumber <= 10) {
+      while (keepGoing && songNumber <= 30) {
         if (tempRaw.includes(songNumber + ".") || tempRaw.includes("1.")) {
           if (tempRaw.includes((songNumber + 1) + ".")) {
             songArray.push(tempRaw.substring(2, tempRaw.indexOf((songNumber + 1) + ".")).trim());
@@ -157,7 +163,7 @@ export default function Home() {
               songArray.push(tempRaw.substring(2, tempRaw.indexOf("1.")).trim());
               songNumber = 1;
             } else {
-              songArray.push(tempRaw.substring((songNumber == 10 ? 3 : 2)).trim());
+              songArray.push(tempRaw.substring((songNumber >= 10 ? 3 : 2)).trim());
               keepGoing = false;
             }
           }
@@ -203,6 +209,10 @@ export default function Home() {
     let index: number = 0;
     let allTracks: any[] = [];
     let anything: boolean = false;
+    let recentSongs: String[] | undefined = localStorage.getItem('rhythmaticRecentSongs')?.split(',');
+    if(recentSongs&&recentSongs[0]==''){
+      recentSongs = [];
+    }
     async function makeRequest(tracksData: string[]) {
       if (index === tracksData.length) {
         setTracks(allTracks);
@@ -232,8 +242,19 @@ export default function Home() {
           }
           return;
         }
+
+        if(recentSongs){
+          if(recentSongs.length >= 30){
+            // removing the oldest song recommedation
+            recentSongs.shift();
+          }
+          //LO FI
+          recentSongs.push(song + '\n' + artist);
+        }
+
         const data = await response.json();
         const track = data?.tracks?.items[0];
+
         if (track) {
           setTracks(tracks => tracks ? [...tracks, track] : [track]);
           allTracks.push(track);
@@ -244,6 +265,12 @@ export default function Home() {
       await makeRequest(tracksData);
     }
     await makeRequest(tracksData);
+
+    if(recentSongs){
+      localStorage.setItem('rhythmaticRecentSongs', recentSongs?.toString());
+    }
+
+    console.log(localStorage.getItem('rhythmaticRecentSongs'));
 
     if (!anything) {
       if (fixingPrompt) {
@@ -349,6 +376,35 @@ export default function Home() {
         window.alert(error);
         throw error;
       }
+    }
+  }
+
+  async function generatePlaylist() {
+    // update loading state
+    setLoading(true);
+
+    // clear tracks
+    setTracks(undefined);
+
+    // Loading box
+    loadBox();
+
+    try {
+      // make request to chatgpt
+      const response = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ texts: localStorage.get('rhythmaticRecentSongs'), mode: "playlist" })
+      });
+
+      // handles the response and parses it like a result
+      await resHandling(response, false);
+    } catch (error: any) {
+      handleErrorUI();
+      window.alert(error);
+      throw error;
     }
   }
 
