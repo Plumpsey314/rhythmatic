@@ -21,6 +21,7 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [haveBeen, setHaveBeen] = useState<boolean>(false);
   const [anyTracks, setAnyTracks] = useState<boolean>(tracks ? tracks.length > 0 ? true : false : false);
+  const [onPlaylist, setOnPlaylist] = useState<boolean>(false);
   // TODO: COOPER replace this with functional link
   const [signedIn, setSignedIn] = useState<boolean>(false);
 
@@ -65,7 +66,7 @@ export default function Home() {
       maxChars += 2;
     }
     const textInterval = setInterval(() => {
-      if (states == promptStates && anyTracks) {
+      if (states == promptStates && anyTracks && !onPlaylist) {
         states = repromptStates;
         stateIndex = 0;
         letterIndex = 0;
@@ -98,6 +99,12 @@ export default function Home() {
     if (!localStorage.getItem('haveBeen')) setRefineTooltip(true);
     const localEmail = localStorage.getItem('email');
     setPopupOpen(!localEmail);
+  }, []);
+
+  useEffect(() => {
+    if(!localStorage.getItem('rhythmaticRecentSongs')){
+      localStorage.setItem('rhythmaticRecentSongs', '');
+    }
   }, []);
 
   useEffect(() => {
@@ -148,7 +155,7 @@ export default function Home() {
       let songNumber: number = 1;
       let tempRaw: string = raw;
       songArray = [];
-      while (keepGoing && songNumber <= 10) {
+      while (keepGoing && songNumber <= 30) {
         if (tempRaw.includes(songNumber + ".") || tempRaw.includes("1.")) {
           if (tempRaw.includes((songNumber + 1) + ".")) {
             songArray.push(tempRaw.substring(2, tempRaw.indexOf((songNumber + 1) + ".")).trim());
@@ -157,7 +164,7 @@ export default function Home() {
               songArray.push(tempRaw.substring(2, tempRaw.indexOf("1.")).trim());
               songNumber = 1;
             } else {
-              songArray.push(tempRaw.substring((songNumber == 10 ? 3 : 2)).trim());
+              songArray.push(tempRaw.substring((songNumber >= 10 ? 3 : 2)).trim());
               keepGoing = false;
             }
           }
@@ -203,6 +210,10 @@ export default function Home() {
     let index: number = 0;
     let allTracks: any[] = [];
     let anything: boolean = false;
+    let recentSongs: String[] | undefined = localStorage.getItem('rhythmaticRecentSongs')?.split(',');
+    if(recentSongs&&recentSongs[0]==''){
+      recentSongs = [];
+    }
     async function makeRequest(tracksData: string[]) {
       if (index === tracksData.length) {
         setTracks(allTracks);
@@ -221,7 +232,7 @@ export default function Home() {
           }
         }
       }
-      if (artist) {
+      if (song && artist) {
         const response = await fetch(`/api/searchtrack?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
         // handle api error
         if (response.status !== 200) {
@@ -232,8 +243,19 @@ export default function Home() {
           }
           return;
         }
+
+        if(recentSongs){
+          while(recentSongs.length >= 30){
+            // removing the oldest song recommedation
+            recentSongs.shift();
+          }
+          //LO FI
+          recentSongs.push(song + '\n' + artist);
+        }
+
         const data = await response.json();
         const track = data?.tracks?.items[0];
+
         if (track) {
           setTracks(tracks => tracks ? [...tracks, track] : [track]);
           allTracks.push(track);
@@ -245,11 +267,13 @@ export default function Home() {
     }
     await makeRequest(tracksData);
 
+    if(recentSongs){
+      localStorage.setItem('rhythmaticRecentSongs', recentSongs?.toString());
+    }
+
     if (!anything) {
       if (fixingPrompt) {
         setLoading(true);
-
-        // loadBox();
 
         // make request to chatgpt
         const response = await fetch("/api/openai", {
@@ -352,13 +376,48 @@ export default function Home() {
     }
   }
 
+  async function generatePlaylist() {
+    // update states
+    setLoading(true);
+    setOnPlaylist(true);
+
+    // clear tracks
+    setTracks(undefined);
+
+    // Loading box
+    loadBox();
+
+    if (localStorage.getItem('rhythmaticRecentSongs')) {
+      try {
+        // make request to chatgpt
+        const response = await fetch("/api/openai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ texts: [ localStorage.getItem('rhythmaticRecentSongs') ], mode: "playlist" })
+        });
+  
+        // handles the response and parses it like a result
+        await resHandling(response, false);
+      } catch (error: any) {
+        handleErrorUI();
+        window.alert(error);
+        throw error;
+      }
+    } else {
+      handleErrorUI();
+      window.alert("Use Rhythmatic before we can generate a playlist for you.");
+    }
+  }
+
   async function loadBox() {
     if (blueLoading.current) {
       blueLoading.current.focus();
       if (textForm.current) {
         textForm.current.blur();
         textForm.current.style.pointerEvents = 'none';
-        textForm.current.style.paddingRight = '90px';
+        textForm.current.style.paddingRight = onPlaylist ? '52px' : '90px';
       }
       let top = 0;
       let left = 0;
@@ -721,7 +780,7 @@ export default function Home() {
                     }
                   }
                 }}>
-                <button className={loading ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon}
+                <button className={(loading || onPlaylist) ? `${styles.submitIcon} ${styles.faded}` : styles.submitIcon}
                   type="button"
                   style={{ right: '50px' }}
                   onClick={() => {
@@ -747,6 +806,15 @@ export default function Home() {
                 />
               </button>
             </Tooltip>
+
+            <button className={loading ? `${styles.generatePlaylist} ${styles.faded}` : styles.generatePlaylist} 
+              type="button"
+              onClick={() => { 
+                generatePlaylist() 
+              }}
+            >
+              Create Playlist!
+            </button>
           </form>
         </div>
         {

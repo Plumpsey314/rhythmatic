@@ -332,6 +332,24 @@
             filter: brightness(0) saturate(100%) invert(12%) sepia(100%) saturate(4787%) hue-rotate(254deg) brightness(109%) contrast(108%);
           }
         }
+
+        .generatePlaylist {
+          width: 120px;
+          font-size: 18px;
+          right: -150px;
+          color: white;
+          border: 1px solid white;
+          border-radius: 5px;
+          &:hover {
+            filter: none;
+            color: #3f0;
+            border-color: #3f0;
+          }
+          &.faded {
+            opacity: 0;
+            pointer-events: none;
+          }
+        }
       }
     }
 
