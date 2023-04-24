@@ -136,13 +136,14 @@ export default function Home() {
     let raw = data.result.trim();
 
     // keeping this commented out line for development ease
-    // window.alert(raw);
+    window.alert(raw);
 
     // parse song array
     let songArray: string[];
 
-    const bracketIndex = raw.indexOf('[');
-    if (bracketIndex === -1) {
+    const openBracketIndex = raw.indexOf('[');
+    const closeBracketIndex = raw.indexOf(']');
+    if (openBracketIndex === -1) {
       // Try to make it work if formated incorectly
       let keepGoing: boolean = true;
       let songNumber: number = 1;
@@ -173,7 +174,7 @@ export default function Home() {
         throw 'Invalid Result';
       }
     } else {
-      raw = raw.substring(bracketIndex);
+      raw = raw.substring(openBracketIndex, closeBracketIndex+1);
       try {
         songArray = JSON.parse(raw);
       } catch (e) {
