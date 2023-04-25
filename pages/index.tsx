@@ -136,7 +136,7 @@ export default function Home() {
     let raw = data.result.trim();
 
     // keeping this commented out line for development ease
-    window.alert(raw);
+    // window.alert(raw);
 
     // parse song array
     let songArray: string[];
