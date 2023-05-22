@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
 import { PineconeClient } from "@pinecone-database/pinecone";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { ChatOpenAI } from "langchain/chat_models";
+import { ChatOpenAI } from "langchain/chat_models/openai";
 import { PineconeStore } from "langchain/vectorstores/pinecone";
 import { VectorDBQAChain } from "langchain/chains";
 
