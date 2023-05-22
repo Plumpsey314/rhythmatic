@@ -88,7 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         returnSourceDocuments: true,
       });
       const answer = await qa.call({query: text, prompt: prompt});
-      console.log(answer.text);
+      // console.log(answer.text);
       res.status(200).json({ result: answer.text });
       return;
     } catch (error: any) {
