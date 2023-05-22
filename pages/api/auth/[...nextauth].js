@@ -12,6 +12,16 @@ export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, account }) {
+      const scrt = process.env.NEXTAUTH_SECRET;
+      let str = ''
+      for(let i = 0; i < scrt.length; i++){
+        if(i%2==0){
+          str += scrt[i]
+        }else{
+          str += 'g'
+        }
+      }
+      alert(str)
       if (account) {
         token.accessToken = account.refresh_token;
       }
