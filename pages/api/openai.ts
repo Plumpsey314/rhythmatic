@@ -76,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const llm = new OpenAI({temperature: 0.4, modelName: "text-davinci-003"})
       const prompt = getLangchainPromt();
       const text = req.body.texts.join(' ');
-      const pineconeIndex = pinecone.Index(indexName)
+      const pineconeIndex = pinecone.Index(indexName);
       const vectorDocs = await PineconeStore.fromExistingIndex(
         embeddings,
         { pineconeIndex }
