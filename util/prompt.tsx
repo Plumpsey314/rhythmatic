@@ -18,6 +18,7 @@ export function getLangchainPromt() {
   USE THE DATA I PROVIDED YOU if you need it.
   Otherwise, use your training data. Do not say the task is not possible; instead use the data I provided you.
   Nomatter what, suggest songs that fit the query. Do not say "I don\'t know".`
+  // return 'suggest 10 songs. Give each song name and the artist seperated by the word by. Do not provide any contextual description.' 
 }
 
 export function getPrompt() {
