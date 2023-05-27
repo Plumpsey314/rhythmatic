@@ -5,7 +5,8 @@ import { PineconeClient } from "@pinecone-database/pinecone";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { PineconeStore } from "langchain/vectorstores/pinecone";
-import { VectorDBQAChain } from "langchain/chains";
+import { RetrievalQAChain } from "langchain/chains";
+import { OpenAI } from 'langchain';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -72,19 +73,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Set up Open AI
       const embeddings = new OpenAIEmbeddings();
-      const llm = new ChatOpenAI({temperature: 0.4, modelName: "gpt-3.5-turbo"})
-
+      const llm = new OpenAI({temperature: 0.4, modelName: "text-davinci-003"})
       const prompt = getLangchainPromt();
       const text = req.body.texts.join(' ');
-      const pineconeIndex = pinecone.Index(indexName)
+      const pineconeIndex = pinecone.Index(indexName);
       const vectorDocs = await PineconeStore.fromExistingIndex(
         embeddings,
         { pineconeIndex }
       );
 
       // Question Answering
-      const qa = VectorDBQAChain.fromLLM(llm, vectorDocs, {
-        k: 6, // This is the number of embedings suggested.
+      const qa = RetrievalQAChain.fromLLM(llm, vectorDocs.asRetriever(6), {
         returnSourceDocuments: true,
       });
       const answer = await qa.call({query: text, prompt: prompt});
