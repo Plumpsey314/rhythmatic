@@ -319,7 +319,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ texts: newText, mode: "langchain" })
+        body: JSON.stringify({ texts: newText, mode: "suggest" })
       });
 
       // handles the response and allows ChatGPT to reprompt itself once

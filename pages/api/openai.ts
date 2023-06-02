@@ -5,7 +5,8 @@ import { PineconeClient } from "@pinecone-database/pinecone";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { PineconeStore } from "langchain/vectorstores/pinecone";
-import { RetrievalQAChain } from "langchain/chains";
+import { RetrievalQAChain, LLMChain } from "langchain/chains";
+import { PromptTemplate } from "langchain/prompts";
 import { OpenAI } from 'langchain';
 
 const configuration = new Configuration({
@@ -59,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // This is the default versions
-  if (req.body.mode = 'langchain') {
+  if (req.body.mode == 'langchain') {
     try{
       // Set up Pinecone
       const pinecone = new PineconeClient();
@@ -131,3 +132,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     handleErrors(error);
   }
 }
+
