@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       const completion = await openai.createCompletion({
-        model: "text-davinci-003",
+        model: "gpt-3.5-turbo-instruct",
         prompt: `${prompt}${text} -> `,
         temperature: .7,
         max_tokens: 256
@@ -74,7 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Set up Open AI
       const embeddings = new OpenAIEmbeddings();
-      const llm = new OpenAI({temperature: 0.4, modelName: "text-davinci-003"})
+      const llm = new OpenAI({temperature: 0.4, modelName: "gpt-3.5-turbo-instruct"})
       const prompt = getLangchainPromt();
       const text = req.body.texts.join(' ');
       const pineconeIndex = pinecone.Index(indexName);
