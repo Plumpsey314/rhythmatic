@@ -175,6 +175,10 @@ export default function Home() {
       }
     } else {
       raw = raw.substring(openBracketIndex, closeBracketIndex+1);
+      if(raw.includes(", etc")){
+        //raw would look something like [important stuff, etc]
+        raw=raw.substring(0, raw.length-6)+']';
+      }
       try {
         songArray = JSON.parse(raw);
       } catch (e) {
